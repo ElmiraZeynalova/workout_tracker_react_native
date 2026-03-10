@@ -1,0 +1,19 @@
+[
+        {
+            "imageUrl": "url",
+            "exerciseName": "Pistol Squat",
+            "muscleGroup": "Quads"
+        },
+        {
+            "imageUrl": "url",
+            "exerciseName": "Push Ups",
+            "muscleGroup": "Chest"
+        },
+        {
+            "imageUrl": "url",
+            "exerciseName": "Diamond Push Ups",
+            "muscleGroup": "Triceps"
+        }
+    ]
+
+    
