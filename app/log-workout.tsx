@@ -6,7 +6,6 @@ export default function LogWorkout() {
   return(
     <View>
         <Text>Hello</Text>
-        <Link href="/">Go Home</Link>
     </View>
   );
 }

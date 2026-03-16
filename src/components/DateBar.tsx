@@ -1,32 +1,94 @@
-import {useDateStore} from "../store/date-store"
-import { Text, View, Pressable, StyleSheet} from "react-native";
-import { SvgXml } from "react-native-svg"
+import {View, Text, Pressable, StyleSheet} from 'react-native'
+import PagerView from 'react-native-pager-view';
+import {useDateStore} from '../store/date-store'
+import {useState, useMemo, useRef, useEffect} from 'react'
+import dayjs from 'dayjs'
+import isoWeek from 'dayjs/plugin/isoWeek'
+dayjs.extend(isoWeek)
 
-const leftArrowIcon = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" transform="scale(-1,1)">
-        <path d="M9.71069 18.2929C10.1012 18.6834 10.7344 18.6834 11.1249 18.2929L16.0123 13.4006C16.7927 12.6195 16.7924 11.3537 16.0117 10.5729L11.1213 5.68254C10.7308 5.29202 10.0976 5.29202 9.70708 5.68254C9.31655 6.07307 9.31655 6.70623 9.70708 7.09676L13.8927 11.2824C14.2833 11.6729 14.2833 12.3061 13.8927 12.6966L9.71069 16.8787C9.32016 17.2692 9.32016 17.9023 9.71069 18.2929Z" fill="#ffffff"/>
-    </svg>
-`;
+const generateWeek= (weekStart: any) => {
+    return Array.from({ length: 7 }, (_, i) => weekStart.add(i, 'day'))
+}
 
-const rightArrowIcon = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-        <path d="M9.71069 18.2929C10.1012 18.6834 10.7344 18.6834 11.1249 18.2929L16.0123 13.4006C16.7927 12.6195 16.7924 11.3537 16.0117 10.5729L11.1213 5.68254C10.7308 5.29202 10.0976 5.29202 9.70708 5.68254C9.31655 6.07307 9.31655 6.70623 9.70708 7.09676L13.8927 11.2824C14.2833 11.6729 14.2833 12.3061 13.8927 12.6966L9.71069 16.8787C9.32016 17.2692 9.32016 17.9023 9.71069 18.2929Z" fill="#ffffff"/>
-    </svg>
-`;
+const generateWeeks = (centerWeek: any) => {
+    return Array.from({length: 3}, (_, i) => {
+        return generateWeek(centerWeek[0].add(i - 1, 'week'))
+    })
+}
 
 export default function DateBar(){
-    const selectedDate = useDateStore((state) => state.selectedDate)
-    const goPrev= useDateStore((state) => state.goPrevDay)
-    const goNext= useDateStore((state) => state.goNextDay)
+    const selectedDate = useDateStore(state => state.selectedDate)
+    const setSelectedDate = useDateStore(state => state.setSelectedDate)
+    const pagerRef = useRef<PagerView>(null)
+    const [centerWeek, setCenterWeek] = useState(() => generateWeek(dayjs(selectedDate).startOf('isoWeek')))
+    const weeks = useMemo(() => generateWeeks(centerWeek), [centerWeek])
+    const [activeIndex, setActiveIndex] = useState(1)
+
+    useEffect(() => {
+        if(!centerWeek.some(day => day.isSame(selectedDate, 'day'))){
+            setCenterWeek(() => generateWeek(dayjs(selectedDate).startOf('isoWeek')))
+        }
+    }, [selectedDate])
+
+
+    function handleSelectedPage(e: any){
+        const index = e.nativeEvent.position
+        setActiveIndex(index)
+
+        const weekday = dayjs(selectedDate).isoWeekday() - 1
+
+        const newDate = weeks[index][weekday] 
+    
+        setSelectedDate(newDate.format('YYYY-MM-DD'))  
+
+        if(index === weeks.length - 1 || index === 0){
+            setCenterWeek(weeks[index])
+        }
+    }
+
     return(
-        <View>
-            <Pressable onPress={goPrev}>
-                <SvgXml xml={leftArrowIcon} width={28} height={28}/>
-            </Pressable>
-            <Text>{selectedDate}</Text>
-            <Pressable onPress={goNext}>
-                <SvgXml xml={rightArrowIcon} width={28} height={28}/>
-            </Pressable>
-        </View>
-    );
+        <PagerView  
+            key={centerWeek[0].format('YYYY-MM-DD')}
+            ref={pagerRef}
+            style={styles.pagerView}
+            initialPage={1}
+            onPageSelected={handleSelectedPage}>
+            {weeks.map((week, idx) => (
+                <View key={idx} style={styles.slide}>
+                    { week.map((day, idx) => (
+                        <View key={idx} style={styles.day}>
+                            <Text>{day.format("dd")[0]}</Text>
+                            <Pressable onPress={() => setSelectedDate(day.format('YYYY-MM-DD'))}><Text>{day.format("D")}</Text></Pressable>
+                        </View>
+                    ))}
+                </View>
+            ))}
+        </PagerView>
+    )
 }
+
+const styles = StyleSheet.create({
+    pagerView: {
+        height: 70,
+        width: '100%',
+    },
+    slide: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+        backgroundColor: '#d44d1b',
+    },
+    day: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 10,
+    },
+    dayLetter:{
+        fontSize: 9,
+    },
+    dayNumber:{
+        fontSize: 14,
+    }
+
+})

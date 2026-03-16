@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import dayjs from 'dayjs'
 
 export type SetInfo = {
+    setId: string
     reps: number | null
     weight?: number | null
 }
@@ -28,7 +28,7 @@ export const useWorkoutStore = create<WorkoutStore>((set) => ({
         set(state => ({
             exercises: [...state.exercises, 
                 ...newExercisesNames.map(newName => (
-                {exerciseId: crypto.randomUUID(), exerciseName: newName, sets: [{reps: null, weight: 0}]}
+                {exerciseId: crypto.randomUUID(), exerciseName: newName, sets: [{setId: crypto.randomUUID(), reps: null, weight: 0}]}
                 ))
             ]
         })),
@@ -40,7 +40,7 @@ export const useWorkoutStore = create<WorkoutStore>((set) => ({
         set(state => ({
             exercises: state.exercises.map(e => 
                 e.exerciseId === exerciseId 
-                    ? {...e, sets: [...e.sets, {reps: null, weight: 0}]}
+                    ? {...e, sets: [...e.sets, {setId: crypto.randomUUID(), reps: null, weight: 0}]}
                     : e
             )
         })),

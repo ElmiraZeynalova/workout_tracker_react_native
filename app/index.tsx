@@ -1,20 +1,19 @@
 import {useState} from 'react'
 import { Text, View, TextInput, Button, StyleSheet} from "react-native";
-import {Stack} from 'expo-router'
-import PagerView from 'react-native-pager-view';
-import Header from '../src/components/Header';
-import DateBar from '../src/components/DateBar';
-import ContentCrousel from '../src/components/ContentCarousel';
+import MainSwiper from "../src/components/MainSwiper"
+import DateBar from "../src/components/DateBar"
 
-export default function Home() {
+export default function Index() {
   return(
-    <View>
-      <Header/>
+    <View style={styles.view}>
       <DateBar/>
-      <ContentCrousel/>
+      <MainSwiper/>
     </View>
   )
-
-
 }
 
+const styles = StyleSheet.create({
+  view: {
+    flex: 1,
+  }
+})

@@ -4,7 +4,6 @@ export default function Calendar(){
     return(
         <View>
             <Text>Calendar Page</Text>
-            <Link href="/">Go Home</Link>
         </View>
     )
 }
