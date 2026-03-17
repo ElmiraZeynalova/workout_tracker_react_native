@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     },
     slide: {
         flex: 1,
-        backgroundColor: '#f1c605',
+        backgroundColor: 'white',
     },
     text: {
         color: 'black',
