@@ -15,7 +15,7 @@ export default function SetForm({reps, weight, updateReps, updateWeight}: Props)
             <TextInput
                 style={styles.input}
                 onChangeText={(n) => updateReps(Number(n))}
-                value={String(reps || '')}
+                value={reps != null ? String(reps) : ''}
                 placeholder="0"
                 keyboardType="numeric"
             />
@@ -23,7 +23,7 @@ export default function SetForm({reps, weight, updateReps, updateWeight}: Props)
             <TextInput
                 style={styles.input}
                 onChangeText={(n) => updateWeight(Number(n))}
-                value={String(weight || '')}
+                value={reps != null ? String(weight) : ''}
                 placeholder="0"
                 keyboardType="numeric"
             />

@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import * as Crypto from 'expo-crypto'
 
 export type SetInfo = {
     setId: string
@@ -28,7 +29,7 @@ export const useWorkoutStore = create<WorkoutStore>((set) => ({
         set(state => ({
             exercises: [...state.exercises, 
                 ...newExercisesNames.map(newName => (
-                {exerciseId: crypto.randomUUID(), exerciseName: newName, sets: [{setId: crypto.randomUUID(), reps: null, weight: 0}]}
+                {exerciseId: Crypto.randomUUID(), exerciseName: newName, sets: [{setId: Crypto.randomUUID(), reps: null, weight: 0}]}
                 ))
             ]
         })),
@@ -40,7 +41,7 @@ export const useWorkoutStore = create<WorkoutStore>((set) => ({
         set(state => ({
             exercises: state.exercises.map(e => 
                 e.exerciseId === exerciseId 
-                    ? {...e, sets: [...e.sets, {setId: crypto.randomUUID(), reps: null, weight: 0}]}
+                    ? {...e, sets: [...e.sets, {setId: Crypto.randomUUID(), reps: null, weight: 0}]}
                     : e
             )
         })),
