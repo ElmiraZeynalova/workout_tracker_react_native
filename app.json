@@ -2,10 +2,14 @@
   "expo": {
     "name": "workout_tracker",
     "slug": "workout_tracker",
+    "scheme": "workouttracker",
     "version": "1.0.0",
+    "extra": {
+      "EXPO_PUBLIC_SUPABASE_URL": "https://wxdhjdmxwollqlsabmpi.supabase.co",
+      "EXPO_PUBLIC_SUPABASE_KEY": "sb_publishable_LxTTbCj0MmOV5JD5v-ltJw_kA0ZrmaV"
+    },
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "workouttracker",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -19,7 +23,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.workout_tracker"
     },
     "web": {
       "output": "static",
@@ -38,7 +43,8 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true,

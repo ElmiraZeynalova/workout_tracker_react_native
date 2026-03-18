@@ -7,6 +7,8 @@ import { useRouter } from 'expo-router';
 import Entypo from '@expo/vector-icons/Entypo';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Exercise from '@/src/components/Exercise'
+import {saveWorkout, printAllWorkouts} from '@/src/sqlite/crud'
+import { syncToServer } from '@/src/supabase/crud';
 
 export default function LogWorkout() {
   const router = useRouter();
@@ -32,8 +34,16 @@ export default function LogWorkout() {
               }))
               .filter(e => e.sets.length > 0)
 
-          // await saveWorkout("workouts", currentWorkoutDate, cleanedExercises)
-
+          await saveWorkout(currentWorkoutDate, cleanedExercises)
+          clearWorkoutStore()
+          router.navigate('/')
+          const { error } = await syncToServer(currentWorkoutDate)
+          if(error) {
+            console.warn("Sync failed", error)
+          }else{
+            console.log("Synced with server")
+          }
+          await printAllWorkouts()
           // await saveWorkout("pending_sync_to_server", currentWorkoutDate, cleanedExercises)
           // clearWorkoutStore()
           // router.navigate('/')

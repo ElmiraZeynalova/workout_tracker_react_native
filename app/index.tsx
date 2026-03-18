@@ -11,6 +11,7 @@ import { useRouter } from 'expo-router';
 export default function Index() {
   const router = useRouter();
   const date = useDateStore(state => state.selectedDate)
+
   return(
     <>
       <Stack.Screen options={{
