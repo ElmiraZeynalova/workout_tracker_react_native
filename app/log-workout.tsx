@@ -6,7 +6,7 @@ import { useWorkoutStore } from '@/src/store/workout-store';
 import { useRouter } from 'expo-router';
 import Entypo from '@expo/vector-icons/Entypo';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import Exercise from '@/src/components/Exercise'
+import LogExercise from '@/src/components/LogExercise'
 import {saveWorkout, printAllWorkouts} from '@/src/sqlite/crud'
 import { syncToServer } from '@/src/supabase/crud';
 
@@ -20,7 +20,7 @@ export default function LogWorkout() {
   const [showFinishModal, setShowFinishModal] = useState<boolean>(false)
 
   const exerciseCards = currentWorkoutExercises.map(exercise => {
-      return <Exercise key={exercise.exerciseId} exerciseId={exercise.exerciseId}/>
+      return <LogExercise key={exercise.exerciseId} exerciseId={exercise.exerciseId}/>
   })
 
   const notValid = currentWorkoutExercises.every(e => e.sets.every(s => s.reps === null))
@@ -79,7 +79,9 @@ export default function LogWorkout() {
           headerTitle: 'Log Workout',
           headerTitleAlign: 'center',
           headerShadowVisible: false,
-
+          headerStyle: {
+            backgroundColor: '#F3F3F3',
+          },
       }} />
 
 
@@ -126,7 +128,7 @@ export default function LogWorkout() {
 const styles = StyleSheet.create({
   view: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#F3F3F3',
   },
   modalWindow: {
 

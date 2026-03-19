@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     pagerView: {
         height: 70,
         width: '100%',
-        backgroundColor: 'white'
+        backgroundColor: '#F3F3F3',
     },
     slide: {
         flexDirection: 'row',

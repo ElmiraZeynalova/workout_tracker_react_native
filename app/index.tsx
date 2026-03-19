@@ -1,5 +1,5 @@
 import {View, Pressable, StyleSheet} from "react-native";
-import { Stack} from "expo-router";
+import { Stack } from "expo-router";
 import MainSwiper from "../src/components/MainSwiper"
 import DateBar from "../src/components/DateBar"
 import { useDateStore } from "@/src/store/date-store";
@@ -26,6 +26,9 @@ export default function Index() {
           headerTitle: dayjs(date).format("MMMM D"),
           headerTitleAlign: 'center',
           headerShadowVisible: false,
+          headerStyle: {
+            backgroundColor: '#F3F3F3',
+          },
 
       }} />
       <View style={styles.view}>

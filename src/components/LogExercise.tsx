@@ -3,7 +3,7 @@ import {Text, Pressable, View, StyleSheet} from 'react-native'
 import { useWorkoutStore } from "../store/workout-store"
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-export default function Exercise({exerciseId}:{exerciseId: string}){
+export default function LogExercise({exerciseId}:{exerciseId: string}){
     const exercise = useWorkoutStore((state) => state.exercises.find(e => e.exerciseId === exerciseId))
     const exerciseSets = exercise?.sets
     const addNewSet = useWorkoutStore((state) => state.addNewSet)

@@ -15,6 +15,9 @@ export default function Calendar(){
                 headerTitle: 'Calendar',
                 headerTitleAlign: 'center',
                 headerShadowVisible: false,
+                headerStyle: {
+                    backgroundColor: '#F3F3F3',
+                },
             }} />
             <View style={styles.view}>
                 <Text>Calendar Page</Text>
@@ -27,5 +30,6 @@ export default function Calendar(){
 const styles = StyleSheet.create({
   view: {
     flex: 1,
+    backgroundColor: '#F3F3F3',
   }
 })

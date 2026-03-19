@@ -3,6 +3,7 @@ import PagerView from 'react-native-pager-view';
 import {useDateStore} from '../store/date-store'
 import {useState, useMemo, useRef, useEffect} from 'react'
 import dayjs from 'dayjs'
+import DayContent from './DayContent';
 
 const RANGE = 14
 function generateDateRange(centerDate: string){
@@ -49,7 +50,7 @@ export default function MainSwiper(){
             onPageSelected={handleSelectedPage}>
             {dates.map(date => (
                 <View key={date} style={styles.slide}>
-                    <Text style={styles.text}>{date}</Text>
+                    <DayContent date={date}/>
                 </View>
             ))}
         </PagerView>
@@ -59,14 +60,12 @@ export default function MainSwiper(){
 const styles = StyleSheet.create({
     pagerView: {
         flex: 1,
+        backgroundColor: '#F3F3F3',
     },
     slide: {
         flex: 1,
-        backgroundColor: 'white',
+        padding: 15,
+
     },
-    text: {
-        color: 'black',
-        fontSize: 16
-    }
 
 })

@@ -25,6 +25,7 @@ export async function getAllWorkoutExercisesDataByDate(date: string){
         [date]
     )
     const data = rawData as unknown as WorkoutRow[]
+    if (!data.length) return []
     const workoutId = data[0].id
 
     const exercisesRaw = await db.getAllAsync(

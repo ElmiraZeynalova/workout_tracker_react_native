@@ -36,12 +36,15 @@ export default function ExercisesList(){
         <>
             <Stack.Screen options={{
                 headerLeft: () => 
-                <Pressable onPress={() => router.navigate('/')} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
-                    <Entypo name="chevron-left" size={24} color="black" />
-                </Pressable>,
+                    <Pressable onPress={() => router.navigate('/')} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
+                        <Entypo name="chevron-left" size={24} color="black" />
+                    </Pressable>,
                 headerTitle: 'All Exercises',
                 headerTitleAlign: 'center',
                 headerShadowVisible: false,
+                headerStyle: {
+                    backgroundColor: '#F3F3F3',
+                },
                 }} 
             />
             <ScrollView style={styles.scrollView}>{exercisesList}</ScrollView>
@@ -55,6 +58,7 @@ export default function ExercisesList(){
 const styles = StyleSheet.create({
     scrollView:{
         flex: 1,
+        backgroundColor: '#F3F3F3',
     },
     button: {
 

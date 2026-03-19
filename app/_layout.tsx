@@ -17,8 +17,7 @@ export default function RootLayout() {
     })
 
     async function loadDB() {
-      const db = await openDB()
-      console.log('DB opened', db)
+      await openDB()
     }
 
     loadDB()
@@ -27,7 +26,7 @@ export default function RootLayout() {
 
   return (
     <>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+      <StatusBar barStyle="dark-content" backgroundColor='#F3F3F3' />
       <Stack>
         <Stack.Screen name="index" />
         <Stack.Screen name="log-in" />
