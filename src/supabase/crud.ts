@@ -5,8 +5,16 @@ import Constants from 'expo-constants'
 import {getAllWorkoutExercisesDataByDate} from "@/src/sqlite/crud"
 const supabaseUrl = Constants.expoConfig?.extra?.EXPO_PUBLIC_SUPABASE_URL
 const supabaseKey = Constants.expoConfig?.extra?.EXPO_PUBLIC_SUPABASE_KEY
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
-export const supabase = createClient(supabaseUrl!, supabaseKey!)
+export const supabase = createClient(supabaseUrl!, supabaseKey!, {
+    auth: {
+        storage: AsyncStorage,
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
+    }
+})
 
 export async function signInUser(email: string) {
     const { error } = await supabase.auth.signInWithOtp({ 
@@ -25,6 +33,7 @@ export async function verifyOtp(email: string, code: string) {
         token: code, 
         type: 'email'
     })
+
     return { data, error }
 }
 

@@ -13,13 +13,6 @@ export default function LogIn() {
     const [code, setCode] = useState('')
     const [loading, setLoading] = useState(false)
 
-    // если email в сторе изменился (например после reload)
-    useEffect(() => {
-        if (emailFromStore) {
-            setLocalEmail(emailFromStore)
-        }
-    }, [emailFromStore])
-
     async function handleLogin() {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             setError('Invalid email address')
@@ -38,7 +31,7 @@ export default function LogIn() {
             return
         }
 
-        setEmail(email) // сохраняем в zustand
+        setEmail(email) 
         setStep('otp')
     }
 
@@ -48,19 +41,17 @@ export default function LogIn() {
             return
         }
 
-        setLoading(true)
+        setLoading(true)  
         setError('')
 
-        const { error } = await verifyOtp(email, code)
+        const { error } = await verifyOtp(email!, code)
 
-        setLoading(false)
+        setLoading(false) 
 
         if (error) {
             setError(error.message)
             return
         }
-
-        // успех → layout сам переключит экран
     }
 
     return (
