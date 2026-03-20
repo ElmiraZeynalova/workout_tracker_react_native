@@ -10,7 +10,12 @@ export async function openDB() {
 
     const db = await SQLite.openDatabaseAsync(DB_NAME)
     await db.execAsync(`PRAGMA foreign_keys = ON;`)
-
+    // await db.runAsync(`DELETE FROM sets`);
+    // console.log("set table deleted")
+    // await db.runAsync(`DELETE FROM exercises`);
+    // console.log("exercise table deleted")
+    // await db.runAsync(`DELETE FROM workouts`);
+    // console.log("workout table deleted")
     await createTables(db)
 
     dbInstance = db

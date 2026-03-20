@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     },
     slide: {
         flex: 1,
-        padding: 15,
+        padding: 18,
 
     },
 

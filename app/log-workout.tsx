@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import {View, Pressable, Text, StyleSheet, ScrollView} from "react-native";
+import {View, Pressable, Text, StyleSheet, ScrollView, Modal} from "react-native";
 import { Stack} from "expo-router";
 import { useDateStore } from "@/src/store/date-store";
 import { useWorkoutStore } from '@/src/store/workout-store';
@@ -43,7 +43,7 @@ export default function LogWorkout() {
           }else{
             console.log("Synced with server")
           }
-          await printAllWorkouts()
+
           // await saveWorkout("pending_sync_to_server", currentWorkoutDate, cleanedExercises)
           // clearWorkoutStore()
           // router.navigate('/')
@@ -62,8 +62,10 @@ export default function LogWorkout() {
   }
 
   function handleDiscard(){
+      setShowDiscardModal(false)
       clearWorkoutStore()
       router.navigate('/')
+
   }
   return(
     <>
@@ -84,30 +86,43 @@ export default function LogWorkout() {
           },
       }} />
 
-
-      {showDiscardModal && 
+      <Modal
+          transparent={true}
+          visible={showDiscardModal}
+          animationType='none'
+          onRequestClose={() => setShowDiscardModal(false)}
+      >
+        <Pressable style={styles.overlay} onPress={() => setShowDiscardModal(false)}>
           <View style={styles.modalWindow}>
-              <Text>Are you sure you want to discard this workout?</Text>
-              <Pressable onPress={handleDiscard} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
-                <Text>Discard Workout</Text>
-              </Pressable>
-              <Pressable onPress={() => setShowDiscardModal(false)} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
-                <Text>Cancel</Text>
+              <Text style={styles.modalWindowText}>Are you sure you want to discard this workout?</Text>
+                <Pressable onPress={handleDiscard} style={({ pressed }) => [styles.modalBtn, pressed && styles.pressed, {borderBottomColor: '#c7c7c76a', borderBottomWidth: 0.3}]}>
+                  <Text style={styles.modalBtnText}>Discard Workout</Text>
+                </Pressable>
+                <Pressable onPress={() => setShowDiscardModal(false)} style={({ pressed }) => [styles.modalBtn, pressed && styles.pressed]}>
+                  <Text style={styles.modalCancelBtnText}>Cancel</Text>
+                </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
+
+      <Modal
+          transparent={true}
+          visible={showFinishModal}
+          animationType='none'
+          onRequestClose={() => setShowFinishModal(false)}
+      >
+        <Pressable style={styles.overlay} onPress={() => setShowFinishModal(false)}>
+          <View style={styles.modalWindow}>
+              {exerciseCards.length === 0 && <Text style={[styles.modalWindowText, {borderBottomColor: '#c7c7c76a', borderBottomWidth: 0.3}]}>Add an exercise</Text>}
+              {(exerciseCards.length > 0 && notValid) && <Text style={[styles.modalWindowText, {borderBottomColor: '#c7c7c76a', borderBottomWidth: 0.3}]}>Your workout has no set values</Text>}
+              <Pressable onPress={() => setShowFinishModal(false)} style={({ pressed }) => [styles.modalBtn, pressed && styles.pressed]}>
+                <Text style={styles.modalBtnText}>Ok</Text>
               </Pressable>
           </View>
-      }
+        </Pressable>
+      </Modal>
 
-      {showFinishModal && 
-          <View style={styles.modalWindow}>
-              {exerciseCards.length === 0 && <Text>Add an exercise</Text>}
-              {(exerciseCards.length > 0 && notValid) && <Text>Your workout has no set values</Text>}
-              <Pressable onPress={() => setShowFinishModal(false)} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
-                <Text>Ok</Text>
-              </Pressable>
-          </View>
-      }
       <View style={styles.view}>
-
         {exerciseCards.length === 0 && 
           <View>
             <Text>Get started</Text>
@@ -115,7 +130,7 @@ export default function LogWorkout() {
           </View>
         }
         {exerciseCards.length > 0 && <ScrollView>{exerciseCards}</ScrollView>}
-        <Pressable  onPress={() => router.navigate('/exercises-list')} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
+        <Pressable  onPress={() => router.navigate('/exercises-list')} style={({ pressed }) => [pressed && styles.pressed]}>
             <AntDesign name="plus" size={24} color="black" />
             <Text>Add Exercise</Text>
         </Pressable>
@@ -130,14 +145,43 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F3F3F3',
   },
-  modalWindow: {
 
-  },
-  button: {
-
-  },
   pressed: {
       opacity: 0.5,
   },
-  
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    paddingHorizontal: 15,
+    paddingBottom: 20,
+  },
+  modalWindow:{
+    width: '90%',
+    marginHorizontal:'auto',
+    borderRadius: 10,
+    backgroundColor: 'white',
+  },
+  modalWindowText:{
+    color: 'black', 
+    fontSize: 17, 
+    fontWeight: 400,
+    textAlign: 'center',
+    padding: 15,
+  },
+  modalBtn:{
+    paddingVertical: 15,
+  },
+  modalCancelBtnText: {
+    color: 'black', 
+    fontSize: 16, 
+    fontWeight: 500,
+    textAlign: 'center',
+  },
+  modalBtnText: {
+      color: '#FF5526',
+      fontSize: 16, 
+      fontWeight: 600,
+      textAlign: 'center',
+  }
 })

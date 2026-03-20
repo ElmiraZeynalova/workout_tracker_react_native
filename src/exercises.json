@@ -1,19 +1,29 @@
 [
         {
-            "imageUrl": "url",
-            "exerciseName": "Pistol Squat",
+            "iconKey": "squat",
+            "exerciseName": "Pistol Squats",
             "muscleGroup": "Quads"
         },
         {
-            "imageUrl": "url",
+            "iconKey": "push-up",
             "exerciseName": "Push Ups",
             "muscleGroup": "Chest"
         },
         {
-            "imageUrl": "url",
+            "iconKey": "push-up",
             "exerciseName": "Diamond Push Ups",
             "muscleGroup": "Triceps"
+        },
+        {
+            "iconKey": "pull-up",
+            "exerciseName": "Pull Ups",
+            "muscleGroup": "Lats"
+        },
+        {
+            "iconKey": "bicep",
+            "exerciseName": "Bicep Curls",
+            "muscleGroup": "Bicep"
         }
-    ]
+]
 
     
