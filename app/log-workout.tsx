@@ -9,7 +9,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import LogExercise from '@/src/components/LogExercise'
 import {saveWorkout, printAllWorkouts} from '@/src/sqlite/crud'
 import { syncToServer } from '@/src/supabase/crud';
-
+import DumbbellIcon from '@/assets/icons/grey_dumbbell.svg'
 export default function LogWorkout() {
   const router = useRouter();
   const currentWorkoutDate = useDateStore(state => state.selectedDate)
@@ -75,8 +75,8 @@ export default function LogWorkout() {
               <Entypo name="chevron-left" size={24} color="black" />
             </Pressable>,
           headerRight: () => 
-              <Pressable onPress={handleFinish} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}>
-                <Text>Finish</Text>
+              <Pressable onPress={handleFinish} style={({ pressed }) => [styles.headerBtn, pressed && styles.pressed]}>
+                <Text style={{color: '#FF5526', fontSize: 12, fontWeight: 500}}>Finish</Text>
               </Pressable>,
           headerTitle: 'Log Workout',
           headerTitleAlign: 'center',
@@ -94,7 +94,7 @@ export default function LogWorkout() {
       >
         <Pressable style={styles.overlay} onPress={() => setShowDiscardModal(false)}>
           <View style={styles.modalWindow}>
-              <Text style={styles.modalWindowText}>Are you sure you want to discard this workout?</Text>
+              <Text style={[styles.modalWindowText, {borderBottomColor: '#c7c7c76a', borderBottomWidth: 0.3}]}>Are you sure you want to discard this workout?</Text>
                 <Pressable onPress={handleDiscard} style={({ pressed }) => [styles.modalBtn, pressed && styles.pressed, {borderBottomColor: '#c7c7c76a', borderBottomWidth: 0.3}]}>
                   <Text style={styles.modalBtnText}>Discard Workout</Text>
                 </Pressable>
@@ -124,15 +124,16 @@ export default function LogWorkout() {
 
       <View style={styles.view}>
         {exerciseCards.length === 0 && 
-          <View>
-            <Text>Get started</Text>
-            <Text>Add an exercise to start your workout</Text>
+          <View style={styles.noWorkoutView}>
+            <DumbbellIcon width={80} height={80}/>
+            <Text style={{color: 'black', fontSize: 22, fontWeight: 500}}>Get started</Text>
+            <Text style={{color: '#00000072', fontSize: 18, fontWeight: 400, marginBottom: 25}}>Add an exercise to start your workout</Text>
           </View>
         }
         {exerciseCards.length > 0 && <ScrollView>{exerciseCards}</ScrollView>}
-        <Pressable  onPress={() => router.navigate('/exercises-list')} style={({ pressed }) => [pressed && styles.pressed]}>
-            <AntDesign name="plus" size={24} color="black" />
-            <Text>Add Exercise</Text>
+        <Pressable  onPress={() => router.navigate('/exercises-list')} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
+            <AntDesign name="plus" size={20} color="white" />
+            <Text style={styles.btnText}>Add Exercise</Text>
         </Pressable>
 
       </View>
@@ -140,12 +141,45 @@ export default function LogWorkout() {
   )
 }
 
+
 const styles = StyleSheet.create({
+  headerBtn: {
+    borderWidth: 1.5,
+    borderColor: '#FF5526',
+    borderRadius: 18,
+    paddingVertical: 6,
+    paddingHorizontal: 18
+  },
   view: {
     flex: 1,
     backgroundColor: '#F3F3F3',
+    marginBottom: 20
   },
 
+  noWorkoutView: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 5,
+    marginTop: 220
+
+  },
+  btn: {
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor:'#FF5526',
+    paddingVertical: 8,
+    paddingHorizontal: 25,
+    borderRadius: 20,
+    marginHorizontal: 'auto'
+  },
+  btnText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 500,
+  },
   pressed: {
       opacity: 0.5,
   },

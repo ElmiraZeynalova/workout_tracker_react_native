@@ -28,10 +28,10 @@ export default function DayContent({date}: {date: string}){
         <View style={styles.view}>
             {!loading && (workout && workout.length === 0) && 
                 <>
-                    <Text>Workout Log Is Empty</Text>
-                    <Pressable onPress={() => router.navigate('/log-workout')} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}>
-                        <AntDesign name="plus" size={24} color="black" />
-                        <Text>Start New Workout</Text>
+                    <Text style={styles.text}>Workout Log Is Empty</Text>
+                    <Pressable onPress={() => router.navigate('/log-workout')} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
+                        <AntDesign name="plus" size={28} color="#FF5526" />
+                        <Text style={styles.btnText}>Start New Workout</Text>
                     </Pressable>
                 </>
             }
@@ -45,8 +45,33 @@ const styles = StyleSheet.create({
     view: {
         flex: 1,
     },
-    exercises:{
+    exercises: {
         flexDirection: 'column',
         gap: 12,
+    },
+    text: {
+        color: '#00000072',
+        fontWeight: 400,
+        fontSize: 22,
+        textAlign: 'center',
+        flexGrow: 1,
+        marginTop: 250
+    },
+    btn: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 5,
+        marginBottom: 10
+    },
+    pressed: {
+      opacity: 0.5,
+    },
+    btnText: {
+        color: '#00000072',
+        fontWeight: 400,
+        fontSize: 17,
+
     }
+
 })

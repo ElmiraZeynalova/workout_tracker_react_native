@@ -36,7 +36,7 @@ export default function ExercisesList(){
         <>
             <Stack.Screen options={{
                 headerLeft: () => 
-                    <Pressable onPress={() => router.navigate('/')} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
+                    <Pressable onPress={() => router.navigate('/log-workout')} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
                         <Entypo name="chevron-left" size={24} color="black" />
                     </Pressable>,
                 headerTitle: 'All Exercises',
