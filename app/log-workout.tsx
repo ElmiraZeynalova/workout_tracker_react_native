@@ -30,7 +30,9 @@ export default function LogWorkout() {
       if(exerciseCards.length > 0 && isValid){
           const cleanedExercises = currentWorkoutExercises
               .map(e => ({
-                  ...e, sets: e.sets.filter(s => s.reps !== null && s.reps > 0)
+                  ...e, sets: e.sets
+                          .filter(s => s.checked === true)
+                          .filter(s => s.reps !== null && s.reps > 0)
               }))
               .filter(e => e.sets.length > 0)
 
@@ -130,7 +132,7 @@ export default function LogWorkout() {
             <Text style={{color: '#00000072', fontSize: 18, fontWeight: 400, marginBottom: 25}}>Add an exercise to start your workout</Text>
           </View>
         }
-        {exerciseCards.length > 0 && <ScrollView>{exerciseCards}</ScrollView>}
+        {exerciseCards.length > 0 && <ScrollView contentContainerStyle={styles.scrollView}>{exerciseCards}</ScrollView>}
         <Pressable  onPress={() => router.navigate('/exercises-list')} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
             <AntDesign name="plus" size={20} color="white" />
             <Text style={styles.btnText}>Add Exercise</Text>
@@ -153,9 +155,13 @@ const styles = StyleSheet.create({
   view: {
     flex: 1,
     backgroundColor: '#F3F3F3',
-    marginBottom: 20
+    marginBottom: 20,
+    padding: 18
   },
-
+  scrollView: {
+    flexDirection: 'column',
+    gap: 12,
+  },  
   noWorkoutView: {
     flexDirection: 'column',
     justifyContent: 'center',

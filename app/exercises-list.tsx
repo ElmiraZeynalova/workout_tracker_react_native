@@ -1,15 +1,18 @@
 import {useState} from 'react'
 import { useWorkoutStore } from '@/src/store/workout-store'
-import {View, Text, StyleSheet, Pressable, ScrollView} from 'react-native'
+import {View, Text, StyleSheet, Pressable, ScrollView, TextInput} from 'react-native'
 import exercises from '@/src/exercises.json'
 import { Stack} from "expo-router"
 import { useRouter } from 'expo-router'
 import Entypo from '@expo/vector-icons/Entypo'
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
+import { exerciseIcons } from '@/assets/icons'
 
 export default function ExercisesList(){
     const router = useRouter();
     const [chosenExercises, setChosenExercises] = useState<string[]>([])
     const addNewExercises = useWorkoutStore((state) => state.addNewExercises)
+    const [search, setSearch] = useState<string>("")
 
     function handleExerciseChoice(exerciseName: string){
         setChosenExercises((prev) => 
@@ -25,10 +28,18 @@ export default function ExercisesList(){
     }
 
     const exercisesList = exercises.map(exercise => {
+        const exerciseIcon = exercises.find(e => e.exerciseName === exercise.exerciseName)?.iconKey
+        const Icon = exerciseIcons[exerciseIcon || '']
+        if (!Icon) return null
+
         return <View key={exercise.exerciseName} >
-                    <Pressable onPress={() => handleExerciseChoice(exercise.exerciseName)}>
-                        <Text>{exercise.exerciseName}</Text>
-                        <Text>{exercise.muscleGroup}</Text>
+                    <Pressable style={({ pressed }) => [styles.exercise, pressed && styles.pressed]} onPress={() => handleExerciseChoice(exercise.exerciseName)}>
+                        {chosenExercises.includes(exercise.exerciseName) && <View style={styles.selectedExercise}></View>}
+                        <Icon width={50} height={50}/>
+                        <View style={styles.exerciseInfo}>
+                            <Text style={{fontSize: 17, fontWeight: 500}}>{exercise.exerciseName}</Text>
+                            <Text style={{fontSize: 14, fontWeight: 400, color: '#8a8a8a'}}>{exercise.muscleGroup}</Text>
+                        </View>
                     </Pressable>
                  </View>
     })      
@@ -36,7 +47,7 @@ export default function ExercisesList(){
         <>
             <Stack.Screen options={{
                 headerLeft: () => 
-                    <Pressable onPress={() => router.navigate('/log-workout')} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
+                    <Pressable onPress={() => router.navigate('/log-workout')} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}>
                         <Entypo name="chevron-left" size={24} color="black" />
                     </Pressable>,
                 headerTitle: 'All Exercises',
@@ -47,24 +58,86 @@ export default function ExercisesList(){
                 },
                 }} 
             />
-            <ScrollView style={styles.scrollView}>{exercisesList}</ScrollView>
-            {chosenExercises.length > 0 && <Pressable onPress={saveChosenExercises} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
-                <Text>{chosenExercises.length === 1 ? "Add 1 exercise" : `Add ${chosenExercises.length} exercises`}</Text>
+            <View style={styles.searchBar}>
+                <FontAwesome6 style={styles.glass} name="magnifying-glass" size={18} color="#a7a7a7" />
+                <TextInput
+                    placeholder="Search exercise"
+                    onChangeText={setSearch}
+                    value={search}
+                    style={styles.input}
+                />
+            </View>
+            <ScrollView contentContainerStyle={styles.scrollView}>{exercisesList}</ScrollView>
+            {chosenExercises.length > 0 && 
+            <Pressable onPress={saveChosenExercises} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
+                <Text style={styles.btnText}>{chosenExercises.length === 1 ? "Add 1 exercise" : `Add ${chosenExercises.length} exercises`}</Text>
             </Pressable>}
     </>
     )
 }
 
 const styles = StyleSheet.create({
-    scrollView:{
-        flex: 1,
-        backgroundColor: '#F3F3F3',
+    searchBar:{
+        position: 'sticky',
+        paddingHorizontal: 18,
+        zIndex: 1
     },
-    button: {
+    input: {
+        backgroundColor: 'white',
+        borderRadius: 50,
+        paddingVertical: 12,
+        paddingLeft: 46,
+        paddingRight: 10
 
+    },
+    glass: {
+        position: 'absolute',
+        zIndex: 2,
+        top: 14,
+        left: 36
     },
     pressed: {
       opacity: 0.5,
     },
+    exercise: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        paddingVertical: 12,
+        borderBottomColor: '#c7c7c76a',
+        borderBottomWidth: 0.3
+    },
+    exerciseInfo:{
+        flexDirection: 'column',
+        gap: 5
+    },
+    selectedExercise: {
+        backgroundColor:'#bbbbbbb2',
+        width: 5,
+        height: 50,
+        borderRadius: 5,
+        margin: 0
+    },
+    scrollView:{
+        flex: 1,
+        backgroundColor: '#F3F3F3',
+        padding: 18,
+        flexDirection: 'column',
+
+    },
+    button: {
+        backgroundColor:'#FF5526',
+        paddingVertical: 8,
+        paddingHorizontal: 25,
+        borderRadius: 20,
+        marginHorizontal: 'auto',
+        marginBottom: 20,
+    },
+    btnText: {
+        color: 'white',
+        fontSize: 14,
+        fontWeight: 500,
+    },
+
   
 })
