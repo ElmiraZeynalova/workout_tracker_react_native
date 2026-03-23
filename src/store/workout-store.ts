@@ -31,7 +31,7 @@ export const useWorkoutStore = create<WorkoutStore>((set) => ({
         set(state => ({
             exercises: [...state.exercises, 
                 ...newExercisesNames.map(newName => (
-                {exerciseId: Crypto.randomUUID(), exerciseName: newName, sets: [{setId: Crypto.randomUUID(), reps: null, weight: 0, checked: false}]}
+                {exerciseId: Crypto.randomUUID(), exerciseName: newName, sets: [{setId: Crypto.randomUUID(), reps: null, weight: null, checked: false}]}
                 ))
             ]
         })),
@@ -43,7 +43,7 @@ export const useWorkoutStore = create<WorkoutStore>((set) => ({
         set(state => ({
             exercises: state.exercises.map(e => 
                 e.exerciseId === exerciseId 
-                    ? {...e, sets: [...e.sets, {setId: Crypto.randomUUID(), reps: null, weight: 0, checked: false}]}
+                    ? {...e, sets: [...e.sets, {setId: Crypto.randomUUID(), reps: null, weight: null, checked: false}]}
                     : e
             )
         })),

@@ -31,6 +31,7 @@ export default function LogWorkout() {
           const cleanedExercises = currentWorkoutExercises
               .map(e => ({
                   ...e, sets: e.sets
+                          .flatMap(s => s.weight === null ? {...s, weight: 0} : s)
                           .filter(s => s.checked === true)
                           .filter(s => s.reps !== null && s.reps > 0)
               }))
@@ -78,13 +79,13 @@ export default function LogWorkout() {
             </Pressable>,
           headerRight: () => 
               <Pressable onPress={handleFinish} style={({ pressed }) => [styles.headerBtn, pressed && styles.pressed]}>
-                <Text style={{color: '#FF5526', fontSize: 12, fontWeight: 500}}>Finish</Text>
+                <Text style={{color: '#FF5526', fontSize: 12, fontWeight: 500, }}>Finish</Text>
               </Pressable>,
           headerTitle: 'Log Workout',
           headerTitleAlign: 'center',
           headerShadowVisible: false,
           headerStyle: {
-            backgroundColor: '#F3F3F3',
+            backgroundColor: '#F3F3F3', 
           },
       }} />
 
@@ -124,21 +125,27 @@ export default function LogWorkout() {
         </Pressable>
       </Modal>
 
-      <View style={styles.view}>
-        {exerciseCards.length === 0 && 
-          <View style={styles.noWorkoutView}>
-            <DumbbellIcon width={80} height={80}/>
-            <Text style={{color: 'black', fontSize: 22, fontWeight: 500}}>Get started</Text>
-            <Text style={{color: '#00000072', fontSize: 18, fontWeight: 400, marginBottom: 25}}>Add an exercise to start your workout</Text>
-          </View>
-        }
-        {exerciseCards.length > 0 && <ScrollView contentContainerStyle={styles.scrollView}>{exerciseCards}</ScrollView>}
-        <Pressable  onPress={() => router.navigate('/exercises-list')} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
+      {exerciseCards.length === 0 && 
+        <View style={styles.noWorkoutView}>
+          <DumbbellIcon width={70} height={70}/>
+          <Text style={{color: 'black', fontSize: 22, fontWeight: 500}}>Get started</Text>
+          <Text style={{color: '#00000072', fontSize: 18, fontWeight: 400, marginBottom: 20}}>Add an exercise to start your workout</Text>
+          <Pressable  onPress={() => router.navigate('/exercises-list')} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
             <AntDesign name="plus" size={20} color="white" />
             <Text style={styles.btnText}>Add Exercise</Text>
-        </Pressable>
+          </Pressable>
+        </View>
+      }
 
-      </View>
+      {exerciseCards.length > 0 && 
+        <ScrollView contentContainerStyle={styles.scrollView}>
+          {exerciseCards}
+          <Pressable  onPress={() => router.navigate('/exercises-list')} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
+            <AntDesign name="plus" size={20} color="white" />
+            <Text style={styles.btnText}>Add Exercise</Text>
+          </Pressable>
+        </ScrollView>
+      }
     </>
   )
 }
@@ -152,24 +159,25 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 18
   },
-  view: {
-    flex: 1,
-    backgroundColor: '#F3F3F3',
-    marginBottom: 20,
-    padding: 18
-  },
+
   scrollView: {
+    backgroundColor: '#F3F3F3',
     flexDirection: 'column',
     gap: 12,
+    paddingHorizontal: 12,
+    paddingBottom: 60
   },  
+
   noWorkoutView: {
+    flex: 1,
+    backgroundColor: '#F3F3F3',
     flexDirection: 'column',
-    justifyContent: 'center',
+    marginTop: '50%',
     alignItems: 'center',
     gap: 5,
-    marginTop: 220
-
+    padding: 12,
   },
+
   btn: {
     flexDirection: 'row',
     gap: 10,

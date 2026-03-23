@@ -73,8 +73,7 @@ const styles = StyleSheet.create({
         gap: 15,
         backgroundColor: 'white',
         borderRadius: 15,
-        paddingVertical: 15,
-        paddingHorizontal: 15,
+        padding: 10,
     },
     top: {
         flexDirection: 'row',

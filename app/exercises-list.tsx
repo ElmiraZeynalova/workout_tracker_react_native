@@ -35,9 +35,9 @@ export default function ExercisesList(){
         return <View key={exercise.exerciseName} >
                     <Pressable style={({ pressed }) => [styles.exercise, pressed && styles.pressed]} onPress={() => handleExerciseChoice(exercise.exerciseName)}>
                         {chosenExercises.includes(exercise.exerciseName) && <View style={styles.selectedExercise}></View>}
-                        <Icon width={50} height={50}/>
+                        <Icon width={55} height={55}/>
                         <View style={styles.exerciseInfo}>
-                            <Text style={{fontSize: 17, fontWeight: 500}}>{exercise.exerciseName}</Text>
+                            <Text style={{fontSize: 18, fontWeight: 400}}>{exercise.exerciseName}</Text>
                             <Text style={{fontSize: 14, fontWeight: 400, color: '#8a8a8a'}}>{exercise.muscleGroup}</Text>
                         </View>
                     </Pressable>
@@ -58,6 +58,7 @@ export default function ExercisesList(){
                 },
                 }} 
             />
+     
             <View style={styles.searchBar}>
                 <FontAwesome6 style={styles.glass} name="magnifying-glass" size={18} color="#a7a7a7" />
                 <TextInput
@@ -67,11 +68,15 @@ export default function ExercisesList(){
                     style={styles.input}
                 />
             </View>
-            <ScrollView contentContainerStyle={styles.scrollView}>{exercisesList}</ScrollView>
+            <ScrollView contentContainerStyle={styles.scrollView}>
+                {exercisesList}
+            </ScrollView>
             {chosenExercises.length > 0 && 
-            <Pressable onPress={saveChosenExercises} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
-                <Text style={styles.btnText}>{chosenExercises.length === 1 ? "Add 1 exercise" : `Add ${chosenExercises.length} exercises`}</Text>
-            </Pressable>}
+                <Pressable onPress={saveChosenExercises} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
+                    <Text style={styles.btnText}>{chosenExercises.length === 1 ? "Add 1 exercise" : `Add ${chosenExercises.length} exercises`}</Text>
+                </Pressable>
+            }
+ 
     </>
     )
 }
@@ -80,7 +85,8 @@ const styles = StyleSheet.create({
     searchBar:{
         position: 'sticky',
         paddingHorizontal: 18,
-        zIndex: 1
+        zIndex: 1,
+        marginBottom: 12
     },
     input: {
         backgroundColor: 'white',
@@ -102,7 +108,7 @@ const styles = StyleSheet.create({
     exercise: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10,
+        gap: 12,
         paddingVertical: 12,
         borderBottomColor: '#c7c7c76a',
         borderBottomWidth: 0.3
@@ -119,19 +125,23 @@ const styles = StyleSheet.create({
         margin: 0
     },
     scrollView:{
-        flex: 1,
         backgroundColor: '#F3F3F3',
-        padding: 18,
+        paddingHorizontal: 12,
         flexDirection: 'column',
+        paddingBottom: 66,
+      
 
     },
     button: {
+        position: 'absolute',
         backgroundColor:'#FF5526',
         paddingVertical: 8,
         paddingHorizontal: 25,
         borderRadius: 20,
-        marginHorizontal: 'auto',
-        marginBottom: 20,
+        bottom: 20,
+        left: 120
+
+
     },
     btnText: {
         color: 'white',

@@ -13,9 +13,9 @@ export default function DayContent({date}: {date: string}){
 
     useEffect(() => {
         async function loadWorkout(){
-        const data = await getAllWorkoutExercisesDataByDate(date)
-        setWorkout(data ?? []) 
-        setLoading(false)
+            const data = await getAllWorkoutExercisesDataByDate(date)
+            setWorkout(data) 
+            setLoading(false)
         }
         loadWorkout()
     }, [date])
@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
     exercises: {
         flexDirection: 'column',
         gap: 12,
+        paddingBottom: 12
     },
     text: {
         color: '#00000072',

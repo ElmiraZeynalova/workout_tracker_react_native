@@ -25,15 +25,15 @@ export default function SetForm({idx, checked, onToggle, reps, weight, updateRep
                 <Text style={{fontWeight: 500}}>{idx + 1}</Text>
                 <TextInput
                     style={styles.input}
-                    onChangeText={(n) => updateReps(Number(n))}
-                    value={reps != null ? String(reps) : ''}
+                    onChangeText={(n) => updateWeight(Number(n))}
+                    value={weight != null ? String(weight) : ''}
                     placeholder="0"
                     keyboardType="numeric"
                 />
                 <TextInput
                     style={styles.input}
-                    onChangeText={(n) => updateWeight(Number(n))}
-                    value={reps != null ? String(weight) : ''}
+                    onChangeText={(n) => updateReps(Number(n))}
+                    value={reps != null ? String(reps) : ''}
                     placeholder="0"
                     keyboardType="numeric"
                 />
@@ -50,7 +50,7 @@ export default function SetForm({idx, checked, onToggle, reps, weight, updateRep
 const styles = StyleSheet.create({
     set: {
         flex: 1,
-        marginHorizontal: 5
+        marginHorizontal: 6 
     },
     setHeader: {
         flexDirection: 'row',

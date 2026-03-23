@@ -3,6 +3,7 @@ import {Text, Pressable, View, StyleSheet} from 'react-native'
 import { useWorkoutStore } from "../store/workout-store"
 import { exerciseIcons } from '@/assets/icons'
 import exercises from '@/src/exercises.json'
+import Entypo from '@expo/vector-icons/Entypo';
 
 export default function LogExercise({exerciseId}:{exerciseId: string}){
     const exercise = useWorkoutStore((state) => state.exercises.find(e => e.exerciseId === exerciseId))
@@ -10,7 +11,7 @@ export default function LogExercise({exerciseId}:{exerciseId: string}){
     const addNewSet = useWorkoutStore((state) => state.addNewSet)
     const updateSet = useWorkoutStore((state) => state.updateSet)
     const toggleChecked = useWorkoutStore(state => state.toggleChecked)
-    
+    const deleteExercise = useWorkoutStore(state => state.deleteExercise)
     function handleAddSetBtnClick(){
         addNewSet(exerciseId)
     }
@@ -27,6 +28,9 @@ export default function LogExercise({exerciseId}:{exerciseId: string}){
             <View style={styles.top}>
                 <Icon width={40} height={40}/>
                 <Text style={styles.exerciseName}>{exercise?.exerciseName}</Text>
+                <Pressable style={({ pressed }) => [pressed && styles.pressed]} onPress={() => deleteExercise(exerciseId)}>
+                    <Entypo name="cross" size={24} color="#858585" />
+                </Pressable>
             </View>
                
             <View style={styles.forms}>{setForms}</View>  
@@ -44,13 +48,13 @@ const styles = StyleSheet.create({
         gap: 15,
         backgroundColor: 'white',
         borderRadius: 15,
-        paddingVertical: 15,
-        paddingHorizontal: 15,
+        padding: 10,
     },
     top: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12
+        gap: 12,
+        marginBottom: 5
     },
     exerciseName: {
         fontWeight: 600,

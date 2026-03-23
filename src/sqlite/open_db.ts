@@ -9,7 +9,7 @@ export async function openDB() {
     if (dbInstance) return dbInstance 
     if (dbPromise) return dbPromise
     dbPromise = (async () => {
-        const db = await SQLite.openDatabaseAsync(DB_NAME)
+        const db = await SQLite.openDatabaseAsync(DB_NAME)           
         await db.execAsync(`PRAGMA foreign_keys = ON;`)
         await createTables(db)
         dbInstance = db

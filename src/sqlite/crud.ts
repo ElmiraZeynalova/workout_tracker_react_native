@@ -1,6 +1,6 @@
 import {openDB} from './open_db'
-import type { Exercise } from '../store/workout-store'
 import * as Crypto from 'expo-crypto'
+import { Exercise } from '../store/workout-store'
 
 type WorkoutRow = {
   id: string
@@ -50,7 +50,8 @@ export async function getAllWorkoutExercisesDataByDate(date: string){
         const sets = setsData.map(s => ({
             setId: s.id,
             reps: s.reps,
-            weight: s.weight
+            weight: s.weight,
+            checked: true
         }))
 
         e.sets = sets
@@ -128,4 +129,17 @@ export async function printAllWorkouts() {
   
   const sets = await db.getAllAsync(`SELECT * FROM sets`)
   console.log('SETS:', sets)
+}
+
+export async function cleanDB(){
+    const db = await openDB()
+    await db.runAsync(
+        `DELETE FROM sets`,
+    );
+    await db.runAsync(
+        `DELETE FROM exercises`,
+    );
+    await db.runAsync(
+            `DELETE FROM workouts`,
+    );
 }
