@@ -12,7 +12,7 @@ type Props = {
     updateWeight: (weight: number) => void
 }
 export default function SetForm({idx, checked, onToggle, reps, weight, updateReps, updateWeight}: Props){
-    
+
     return(
         <View style={styles.set}>
             {idx === 0 && <View style={styles.setHeader}>

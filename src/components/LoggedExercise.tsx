@@ -6,9 +6,12 @@ import Fontisto from '@expo/vector-icons/Fontisto';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { exerciseIcons } from '@/assets/icons'
 import exercises from '@/src/exercises.json'
+import {deleteExercise} from '@/src/sqlite/crud'
+import { useRouter } from 'expo-router';
 
-export default function LoggedExercise({exercise}: {exercise: Exercise}){
+export default function LoggedExercise({date, exercise, onDelete}: {date: string, exercise: Exercise, onDelete: () => void}){
     const [showModal, setShowModal] = useState<boolean>(false)
+    const router = useRouter();
     const sets = exercise.sets.map((set, idx) => (
         {
             id: idx + 1,
@@ -19,6 +22,21 @@ export default function LoggedExercise({exercise}: {exercise: Exercise}){
     const exerciseIcon = exercises.find(e => e.exerciseName === exercise.exerciseName)?.iconKey
     const Icon = exerciseIcons[exerciseIcon || '']
     if (!Icon) return null
+
+    async function handleDeleteExr(){
+        await deleteExercise(exercise.exerciseId)
+        setShowModal(false)
+        onDelete()
+    }
+
+    async function handleEditExr(){
+        router.push({
+            pathname: '/edit-exercise',
+            params: { exerciseId: exercise.exerciseId }
+        })
+        setShowModal(false)
+    }
+
     return(
         <>
             <Modal
@@ -30,11 +48,11 @@ export default function LoggedExercise({exercise}: {exercise: Exercise}){
                 <Pressable style={styles.overlay} onPress={() => setShowModal(false)}>
                     <View style={styles.modalWindow}>
                         <View style={styles.modalBtns}>
-                            <Pressable style={({ pressed }) => [styles.modalBtn, pressed && styles.pressed, {borderBottomColor: '#c7c7c76a', borderBottomWidth: 0.2, paddingBottom: 20}]}>
+                            <Pressable onPress={handleEditExr} style={({ pressed }) => [styles.modalBtn, pressed && styles.pressed, {borderBottomColor: '#c7c7c76a', borderBottomWidth: 0.2, paddingBottom: 20}]}>
                                 <AntDesign name="edit" size={20} color="#8e8e8e" />
                                 <Text style={[styles.modalBtnText, ]}>Edit exercise</Text>
                             </Pressable>
-                            <Pressable style={({ pressed }) => [styles.modalBtn, pressed && styles.pressed]}>
+                            <Pressable onPress={handleDeleteExr} style={({ pressed }) => [styles.modalBtn, pressed && styles.pressed]}>
                                 <Fontisto name="trash" size={20} color="#8e8e8e" />
                                 <Text style={styles.modalBtnText}>Delete exercise</Text>
                             </Pressable>

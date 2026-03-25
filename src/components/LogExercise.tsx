@@ -3,7 +3,7 @@ import {Text, Pressable, View, StyleSheet} from 'react-native'
 import { useWorkoutStore } from "../store/workout-store"
 import { exerciseIcons } from '@/assets/icons'
 import exercises from '@/src/exercises.json'
-import Entypo from '@expo/vector-icons/Entypo';
+import Entypo from '@expo/vector-icons/Entypo'
 
 export default function LogExercise({exerciseId}:{exerciseId: string}){
     const exercise = useWorkoutStore((state) => state.exercises.find(e => e.exerciseId === exerciseId))
@@ -12,10 +12,11 @@ export default function LogExercise({exerciseId}:{exerciseId: string}){
     const updateSet = useWorkoutStore((state) => state.updateSet)
     const toggleChecked = useWorkoutStore(state => state.toggleChecked)
     const deleteExercise = useWorkoutStore(state => state.deleteExercise)
+
     function handleAddSetBtnClick(){
         addNewSet(exerciseId)
     }
-  
+
     const setForms = exerciseSets?.map((set, idx) => {
         return <SetForm key={idx} idx={idx} checked={set.checked} onToggle={() => toggleChecked(exerciseId, idx)} reps={set.reps} weight={set.weight} updateReps={(v) => updateSet(exerciseId, idx, "reps", v)} updateWeight={(v) => updateSet(exerciseId, idx, "weight", v)}/>
     })

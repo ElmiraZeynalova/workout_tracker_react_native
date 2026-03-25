@@ -12,16 +12,16 @@ export default function DayContent({date}: {date: string}){
     const router = useRouter();
 
     useEffect(() => {
-        async function loadWorkout(){
-            const data = await getAllWorkoutExercisesDataByDate(date)
-            setWorkout(data) 
-            setLoading(false)
-        }
         loadWorkout()
     }, [date])
 
+    async function loadWorkout(){
+        const data = await getAllWorkoutExercisesDataByDate(date)
+        setWorkout(data) 
+        setLoading(false)
+    }
     const loggedExercises = workout?.map(exercise => (
-        <LoggedExercise key={exercise.exerciseId} exercise={exercise}/>
+        <LoggedExercise key={exercise.exerciseId} date={date} exercise={exercise} onDelete={loadWorkout}/>
     ))
 
     return(

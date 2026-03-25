@@ -25,24 +25,27 @@ export default function ExercisesList(){
     function saveChosenExercises(){
         addNewExercises(chosenExercises)
         router.navigate('/log-workout')
-    }
+    }  
 
-    const exercisesList = exercises.map(exercise => {
-        const exerciseIcon = exercises.find(e => e.exerciseName === exercise.exerciseName)?.iconKey
-        const Icon = exerciseIcons[exerciseIcon || '']
-        if (!Icon) return null
+    const exercisesList = exercises
+        .filter(e => e.exerciseName.toLowerCase().includes(search.toLowerCase()))
+        .map(e => {
+            const exerciseIcon = exercises.find(ex => ex.exerciseName === e.exerciseName)?.iconKey
+            const Icon = exerciseIcons[exerciseIcon || '']
+            if (!Icon) return null
+            return(
+            <View key={e.exerciseName} >
+                <Pressable style={({ pressed }) => [styles.exercise, pressed && styles.pressed]} onPress={() => handleExerciseChoice(e.exerciseName)}>
+                    {chosenExercises.includes(e.exerciseName) && <View style={styles.selectedExercise}></View>}
+                    <Icon width={55} height={55}/>
+                    <View style={styles.exerciseInfo}>
+                        <Text style={{fontSize: 18, fontWeight: 400}}>{e.exerciseName}</Text>
+                        <Text style={{fontSize: 14, fontWeight: 400, color: '#8a8a8a'}}>{e.muscleGroup}</Text>
+                    </View>
+                </Pressable>
+            </View>
+        )})
 
-        return <View key={exercise.exerciseName} >
-                    <Pressable style={({ pressed }) => [styles.exercise, pressed && styles.pressed]} onPress={() => handleExerciseChoice(exercise.exerciseName)}>
-                        {chosenExercises.includes(exercise.exerciseName) && <View style={styles.selectedExercise}></View>}
-                        <Icon width={55} height={55}/>
-                        <View style={styles.exerciseInfo}>
-                            <Text style={{fontSize: 18, fontWeight: 400}}>{exercise.exerciseName}</Text>
-                            <Text style={{fontSize: 14, fontWeight: 400, color: '#8a8a8a'}}>{exercise.muscleGroup}</Text>
-                        </View>
-                    </Pressable>
-                 </View>
-    })      
     return(
         <>
             <Stack.Screen options={{
@@ -68,6 +71,7 @@ export default function ExercisesList(){
                     style={styles.input}
                 />
             </View>
+
             <ScrollView contentContainerStyle={styles.scrollView}>
                 {exercisesList}
             </ScrollView>

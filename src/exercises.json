@@ -23,7 +23,126 @@
             "iconKey": "bicep",
             "exerciseName": "Bicep Curls",
             "muscleGroup": "Biceps"
+        },
+        {
+            "iconKey": "squat",
+            "exerciseName": "Bulgarian Split Squats",
+            "muscleGroup": "Quads"
+        },
+        {
+            "iconKey": "squat",
+            "exerciseName": "Sumo Squats",
+            "muscleGroup": "Glutes"
+        },
+        {
+            "iconKey": "squat",
+            "exerciseName": "Lunges",
+            "muscleGroup": "Quads"
+        },
+        {
+            "iconKey": "squat",
+            "exerciseName": "Reverse Lunges",
+            "muscleGroup": "Glutes"
+        },
+        {
+            "iconKey": "squat",
+            "exerciseName": "Walking Lunges",
+            "muscleGroup": "Quads"
+        },
+        {
+            "iconKey": "push-up",
+            "exerciseName": "Pike Push Ups",
+            "muscleGroup": "Shoulders"
+        },
+        {
+            "iconKey": "push-up",
+            "exerciseName": "Archer Push Ups",
+            "muscleGroup": "Chest"
+        },
+        {
+            "iconKey": "pull-up",
+            "exerciseName": "Chin Ups",
+            "muscleGroup": "Biceps"
+        },
+        {
+            "iconKey": "bicep",
+            "exerciseName": "Hammer Curls",
+            "muscleGroup": "Biceps"
+        },
+        {
+            "iconKey": "bicep",
+            "exerciseName": "Tricep Dips",
+            "muscleGroup": "Triceps"
+        },
+        {
+            "iconKey": "bicep",
+            "exerciseName": "Bench Dips",
+            "muscleGroup": "Triceps"
+        },
+        {
+            "iconKey": "push-up",
+            "exerciseName": "Hanging Knee Raises",
+            "muscleGroup": "Abs"
+        },
+        {
+            "iconKey": "push-up",
+            "exerciseName": "Romanian Deadlift",
+            "muscleGroup": "Hamstrings"
+        },
+        {
+            "iconKey": "push-up",
+            "exerciseName": "Single Leg Deadlift",
+            "muscleGroup": "Hamstrings"
+        },
+        {
+            "iconKey": "squat",
+            "exerciseName": "Glute Bridges",
+            "muscleGroup": "Glutes"
+        },
+        {
+            "iconKey": "squat",
+            "exerciseName": "Hip Thrusts",
+            "muscleGroup": "Glutes"
+        },
+        {
+            "iconKey": "squat",
+            "exerciseName": "Calf Raises",
+            "muscleGroup": "Calves"
+        },
+        {
+            "iconKey": "squat",
+            "exerciseName": "Single Leg Calf Raises",
+            "muscleGroup": "Calves"
+        },
+        {
+            "iconKey": "push-up",
+            "exerciseName": "Inverted Rows",
+            "muscleGroup": "Upper Back"
+        },
+        {
+            "iconKey": "push-up",
+            "exerciseName": "Dumbbell Rows",
+            "muscleGroup": "Upper Back"
+        },
+        {
+            "iconKey": "bicep",
+            "exerciseName": "Overhead Press",
+            "muscleGroup": "Shoulders"
+        },
+        {
+            "iconKey": "bicep",
+            "exerciseName": "Lateral Raises",
+            "muscleGroup": "Shoulders"
+        },
+        {
+            "iconKey": "bicep",
+            "exerciseName": "Front Raises",
+            "muscleGroup": "Shoulders"
+        },
+        {
+            "iconKey": "biceps",
+            "exerciseName": "Arnold Press",
+            "muscleGroup": "Shoulders"
         }
 ]
-
     

@@ -23,6 +23,8 @@ type WorkoutStore = {
     updateSet: (exerciseId: string, setIdx: number, fieldName: string, value: number) => void
     toggleChecked: (exerciseId: string, setIdx: number) => void
     clearWorkout: () => void
+    loadExerciseForEdit: (exercise: Exercise) => void
+
 }
 
 export const useWorkoutStore = create<WorkoutStore>((set) => ({
@@ -31,7 +33,7 @@ export const useWorkoutStore = create<WorkoutStore>((set) => ({
         set(state => ({
             exercises: [...state.exercises, 
                 ...newExercisesNames.map(newName => (
-                {exerciseId: Crypto.randomUUID(), exerciseName: newName, sets: [{setId: Crypto.randomUUID(), reps: null, weight: null, checked: false}]}
+                {exerciseId: Crypto.randomUUID(), exerciseName: newName, sets: [{setId: Crypto.randomUUID(), reps: 5, weight: null, checked: true}]}
                 ))
             ]
         })),
@@ -43,7 +45,7 @@ export const useWorkoutStore = create<WorkoutStore>((set) => ({
         set(state => ({
             exercises: state.exercises.map(e => 
                 e.exerciseId === exerciseId 
-                    ? {...e, sets: [...e.sets, {setId: Crypto.randomUUID(), reps: null, weight: null, checked: false}]}
+                    ? {...e, sets: [...e.sets, {setId: Crypto.randomUUID(), reps: 15, weight: null, checked: true}]}
                     : e
             )
         })),
@@ -85,6 +87,11 @@ export const useWorkoutStore = create<WorkoutStore>((set) => ({
         })),
 
     clearWorkout: () => 
-        set({exercises: []})
+        set({exercises: []}),
+
+    loadExerciseForEdit: (exercise: Exercise) => 
+        set((state) => ({
+            exercises: [exercise]
+    }))
     
 }))

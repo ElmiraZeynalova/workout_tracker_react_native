@@ -7,7 +7,8 @@ export async function createTables(db: SQLiteDatabase){
     await db.execAsync(`
         CREATE TABLE IF NOT EXISTS workouts (
             id TEXT PRIMARY KEY,
-            date TEXT NOT NULL UNIQUE
+            date TEXT NOT NULL UNIQUE,
+            is_synced INTEGER DEFAULT 0
         );
     `)
 

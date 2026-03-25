@@ -1,10 +1,12 @@
 import { StatusBar } from "react-native"
 import {useEffect} from 'react'
 import {openDB} from '@/src/sqlite/open_db'
-import { supabase } from '@/src/supabase/crud'
+import {printAllWorkouts, cleanDB} from '@/src/sqlite/crud'
+import { supabase, syncWorkouts } from '@/src/supabase/crud'
 import { useUserStore } from "@/src/store/user-store";
 import { Stack, Redirect } from 'expo-router'
-import {cleanDB} from '@/src/sqlite/crud'
+import NetInfo from '@react-native-community/netinfo'
+
 export default function RootLayout() {
   const setUserId = useUserStore((state) => state.setUserId)
   const userId = useUserStore((state) => state.userId)
@@ -20,10 +22,35 @@ export default function RootLayout() {
     async function loadDB() {
       //await cleanDB()
       await openDB()
+      await printAllWorkouts()
     }
 
+    let isSyncing = false
+
+    async function syncDataWithServer() {
+      if (isSyncing) return
+      isSyncing = true
+      try {
+        await syncWorkouts()
+        console.log("Synced with supabase!")
+      } finally {
+        isSyncing = false
+      }
+    }
+
+    const unsubscribe = NetInfo.addEventListener(state => {
+      if (state.isConnected) {
+        console.log("Syncing sql with supabase...")
+        syncDataWithServer() 
+      }
+    })
+
     loadDB()
-    return () => authListener?.subscription.unsubscribe()
+
+    return () => {
+      authListener?.subscription.unsubscribe()
+      unsubscribe()
+    }
   }, [])
 
   return (

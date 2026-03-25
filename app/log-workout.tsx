@@ -7,9 +7,9 @@ import { useRouter } from 'expo-router';
 import Entypo from '@expo/vector-icons/Entypo';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import LogExercise from '@/src/components/LogExercise'
-import {saveWorkout, printAllWorkouts} from '@/src/sqlite/crud'
-import { syncToServer } from '@/src/supabase/crud';
+import {saveWorkout} from '@/src/sqlite/crud'
 import DumbbellIcon from '@/assets/icons/grey_dumbbell.svg'
+
 export default function LogWorkout() {
   const router = useRouter();
   const currentWorkoutDate = useDateStore(state => state.selectedDate)
@@ -37,27 +37,10 @@ export default function LogWorkout() {
               }))
               .filter(e => e.sets.length > 0)
 
-          await saveWorkout(currentWorkoutDate, cleanedExercises)
+          await saveWorkout(currentWorkoutDate, cleanedExercises, 0)
+          console.log("Saved workout to SQLITE")
           clearWorkoutStore()
           router.navigate('/')
-          const { error } = await syncToServer(currentWorkoutDate)
-          if(error) {
-            console.warn("Sync failed", error)
-          }else{
-            console.log("Synced with server")
-          }
-
-          // await saveWorkout("pending_sync_to_server", currentWorkoutDate, cleanedExercises)
-          // clearWorkoutStore()
-          // router.navigate('/')
-
-          // const { error } = await syncToServer(currentWorkoutDate)
-
-          // if(error) {
-          //     console.warn("Sync failed", error)
-          // } else {
-          //     await deleteWorkoutByDate("pending_sync_to_server", currentWorkoutDate)
-          // }
     
       }else{
           setShowFinishModal(true)
