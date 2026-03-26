@@ -36,7 +36,6 @@ export async function getUnsyncedWorkouts(){
             [w.id]
          )
         const exerciseData = exercisesRaw as unknown as ExerciseRow[]
-        if (!exerciseData.length) return null
 
         for(const e of exerciseData){
             const setsRaw = await db.getAllAsync(
@@ -44,7 +43,7 @@ export async function getUnsyncedWorkouts(){
                 [e.id]
              )
             const setsData = setsRaw as unknown as SetRow[]
-            if (!setsData.length) continue
+
             const sets = setsData.map(s => ({
                 setId: s.id,
                 reps: s.reps,
@@ -60,9 +59,28 @@ export async function getUnsyncedWorkouts(){
     return workouts
 }
 
+export async function getWorkoutId(date: string){
+    const db = await openDB()
+    const rawData = await db.getAllAsync(
+            `SELECT * FROM workouts WHERE date = ?`,
+            [date]
+        ) 
+    const data = rawData as unknown as WorkoutRow[]
+    if (!data.length) return null
+    const workoutId = data[0].id
+    return workoutId
+}
+
 export async function markWorkoutSynced(workoutId: string){
     const db = await openDB()
     await db.runAsync(`UPDATE workouts SET is_synced = 1 WHERE id = ?`, [workoutId])
+    console.log('workout marked synced!')
+}
+
+export async function markWorkoutUnsynced(workoutId: string){
+    const db = await openDB()
+    await db.runAsync(`UPDATE workouts SET is_synced = 0 WHERE id = ?`, [workoutId])
+    console.log('workout marked UNsynced!')
 }
 
 export async function getExercisesDataByDateAndId(date: string, exerciseId: string){
@@ -152,6 +170,9 @@ export async function saveWorkout(date: string, exercises: Exercise[], status: n
 
     if (data.length > 0) {
         workoutId = data[0].id
+        await db.runAsync(`
+            UPDATE workouts SET is_synced = ? WHERE id = ?
+        `, [status, workoutId])
     } else {
         workoutId = Crypto.randomUUID()
         await db.runAsync(`

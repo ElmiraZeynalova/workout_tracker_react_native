@@ -6,7 +6,7 @@ import Fontisto from '@expo/vector-icons/Fontisto';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { exerciseIcons } from '@/assets/icons'
 import exercises from '@/src/exercises.json'
-import {deleteExercise} from '@/src/sqlite/crud'
+import {deleteExercise, getWorkoutId, markWorkoutUnsynced} from '@/src/sqlite/crud'
 import { useRouter } from 'expo-router';
 
 export default function LoggedExercise({date, exercise, onDelete}: {date: string, exercise: Exercise, onDelete: () => void}){
@@ -25,6 +25,12 @@ export default function LoggedExercise({date, exercise, onDelete}: {date: string
 
     async function handleDeleteExr(){
         await deleteExercise(exercise.exerciseId)
+        try {
+            const workoutId = await getWorkoutId(date)
+            if(workoutId) await markWorkoutUnsynced(workoutId)
+        } catch(e) {
+            console.warn("Failed to mark workout unsynced:", e)
+        }
         setShowModal(false)
         onDelete()
     }

@@ -36,45 +36,95 @@ export async function verifyOtp(email: string, code: string) {
 
     return { data, error }
 }
-//[{workoutId: w.id, date: w.date, exercises: exercises}]
-//[{exerciseId: e.id, exerciseName: e.name, sets: sets}]
-//[{setId: s.id,reps: s.reps, weight: s.weight, checked: true}]
+
 export async function syncWorkouts(){
     const userId = useUserStore.getState().userId
     const workoutsData = await getUnsyncedWorkouts()
+    console.log(workoutsData)
     if(!workoutsData) return 
+
     for(const w of workoutsData){
-        const { data: workout, error: workoutError } = await supabase
+        if(w.exercises.length === 0){
+            console.log("updated workout is empty? so i'm deleting it...")
+            const {data: workoutData, error: workoutError} = await supabase
+                .from('workouts')
+                .select('id')
+                .eq('date', w.date)
+                .eq('user_id', userId)
+                .single()
+            const workoutId = workoutData?.id
+            const {data: exercises, error: exerciseError} = await supabase
+                .from('exercises')
+                .select('id')
+                .eq('workout_id', workoutId)
+
+            const exerciseIds = exercises?.map(e => e.id) || []
+
+            if(exerciseIds && exerciseIds.length > 0){
+                await supabase.from('sets').delete().in('exercise_id', exerciseIds)
+                await supabase.from('exercises').delete().in('id', exerciseIds)
+            }
+
+            if(workoutId){
+                await supabase.from('workouts').delete().eq('id', workoutId)
+            }
+            await markWorkoutSynced(w.workoutId)
+            console.log("delted and marked synced")
+            continue
+        }
+        const { data: workout, error: upsertWorkoutError } = await supabase
             .from('workouts')
             .upsert(
                 { user_id: userId, date: w.date },
-                { onConflict: 'date'}
+                { onConflict: 'user_id,date' }
             )
             .select()
             .single()
 
-        if(workoutError) return { error: workoutError }
+        if(upsertWorkoutError) return { error: upsertWorkoutError}
         const workoutId = workout.id
 
-        const {error: exerciseError} = await supabase
+        const {data: exercises, error: getExerciseError} = await supabase
             .from('exercises')
-            .upsert(
-                w.exercises.map(e => (
-                    { id: e.exerciseId, name: e.exerciseName, workout_id: workoutId }
-                ))
-            )
-        if(exerciseError) return { error: exerciseError }
+            .select()
+            .eq('workout_id', workoutId)
 
-        const {error: setError} = await supabase
+        if(getExerciseError) return { error: getExerciseError }
+        const exerciseIds = exercises.map(e => e.id) || []
+
+        const {error: deleteSetsError} = await supabase
             .from('sets')
-            .upsert(
-                w.exercises.flatMap(e => (
-                    e.sets.map(set => (
-                        { id: set.setId, exercise_id: e.exerciseId, reps: set.reps, weight: set.weight }
-                    ))
+            .delete()
+            .in('exercise_id', exerciseIds)
+        if(deleteSetsError) return { error: deleteSetsError }
+
+        const {error: deleteExercisesError} = await supabase
+            .from('exercises')
+            .delete()
+            .eq('workout_id', workoutId)
+
+        if(deleteExercisesError) return { error: deleteExercisesError }
+
+        const {error: insertExercisesError} = await supabase
+            .from('exercises')
+            .insert(
+                w.exercises.map(e => (
+                    {id: e.exerciseId, name: e.exerciseName, workout_id: workoutId}
                 ))
             )
-        if(setError) return { error: setError }
+        if(insertExercisesError) return { error: insertExercisesError}
+
+        const {error: insertSetsError} = await supabase
+            .from('sets')
+            .insert(
+                w.exercises.flatMap(e => 
+                    e.sets.map(s => (
+                        {id: s.setId, exercise_id: e.exerciseId, reps: s.reps, weight: s.weight}
+                    )
+                ))
+            )
+        if(insertSetsError) return { error: insertSetsError}
+
         await markWorkoutSynced(w.workoutId)
     }
     return {error: null}

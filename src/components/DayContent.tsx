@@ -10,10 +10,10 @@ export default function DayContent({date}: {date: string}){
     const [workout, setWorkout] = useState<Exercise[] | null>(null)
     const [loading, setLoading] = useState(true)
     const router = useRouter();
-
+    
     useEffect(() => {
         loadWorkout()
-    }, [date])
+    }, [])
 
     async function loadWorkout(){
         const data = await getAllWorkoutExercisesDataByDate(date)

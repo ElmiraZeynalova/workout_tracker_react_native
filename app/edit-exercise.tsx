@@ -2,8 +2,7 @@ import Entypo from '@expo/vector-icons/Entypo';
 import {View, Pressable, Text, StyleSheet, ScrollView} from "react-native";
 import { Stack} from "expo-router";
 import { useRouter } from 'expo-router';
-import {getExercisesDataByDateAndId,saveWorkout, deleteExercise} from '@/src/sqlite/crud'
-import { syncToServer } from '@/src/supabase/crud';
+import {getExercisesDataByDateAndId,saveWorkout, deleteExercise, getWorkoutId, markWorkoutUnsynced} from '@/src/sqlite/crud'
 import { useLocalSearchParams } from 'expo-router'
 import {useEffect} from 'react'
 import { useDateStore } from "@/src/store/date-store";
@@ -15,7 +14,7 @@ export default function EditExercise(){
     const router = useRouter()
     const workoutDate = useDateStore(state => state.selectedDate)
     const loadExerciseForEdit = useWorkoutStore(state => state.loadExerciseForEdit)
-    const currentWorkoutExercises = useWorkoutStore((state) => state.exercises)
+    const editingExercise = useWorkoutStore((state) => state.exercises[0])
     const clearWorkoutStore = useWorkoutStore((state) => state.clearWorkout) 
 
     useEffect(() => {
@@ -28,42 +27,42 @@ export default function EditExercise(){
 
     async function handleSave(){
         console.log("Editing....")
-        const cleanedExercises = currentWorkoutExercises
-            .map(e => ({
-                ...e, sets: e.sets
-                        .flatMap(s => s.weight === null ? {...s, weight: 0} : s)
-                        .filter(s => s.checked === true)
-                        .filter(s => s.reps !== null && s.reps > 0)
-            }))
-            .filter(e => e.sets.length > 0)
-
-        if(cleanedExercises.length === 0) {
-            await deleteExercise(exerciseId)
-            clearWorkoutStore()
-            router.navigate('/')
-        }else{
-            await saveWorkout(workoutDate, cleanedExercises, 0)
-            clearWorkoutStore()
-
-            router.navigate('/')
-
-            const { error } = await syncToServer(workoutDate)
-
-            if(error) {
-                console.warn("Sync failed", error)
-            }else{
-                console.log("Synced with server")
-            }
+        const cleanExerciseData = {
+            exerciseId: editingExercise.exerciseId,
+            exerciseName: editingExercise.exerciseName,
+            sets: editingExercise.sets
+                    .filter(s => s.checked === true)
+                    .filter(s => s.reps !== null && s.reps > 0)
+                    .flatMap(s => s.weight === null ? {...s, weight: 0} : s)
         }
-
+        if(cleanExerciseData.sets.length === 0) {
+            console.log("Exercise has no sets now")
+            await deleteExercise(exerciseId)
+            console.log("Exercise deleted!")
+        }else{
+            await saveWorkout(workoutDate, [cleanExerciseData], 0)
+            console.log("Exercise edited!")
+        }
+        try {
+            const workoutId = await getWorkoutId(workoutDate)
+            if(workoutId) await markWorkoutUnsynced(workoutId)
+        } catch(e) {
+            console.warn("Failed to mark workout unsynced:", e)
+        }
+        clearWorkoutStore()
+        router.navigate('/')
     }
 
+    function handleExitEditPage(){
+        clearWorkoutStore()
+        router.navigate('/')
+    }
     return(
         <>
             <Stack.Screen options={{
                 headerLeft: () => 
-                    <Pressable onPress={() => router.navigate('/')} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}>
-                    <Entypo name="chevron-left" size={24} color="black" />
+                    <Pressable onPress={handleExitEditPage} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}>
+                        <Entypo name="chevron-left" size={24} color="black" />
                     </Pressable>,
                 headerRight: () => 
                     <Pressable onPress={handleSave} style={({ pressed }) => [styles.headerBtn, pressed && styles.pressed]}>

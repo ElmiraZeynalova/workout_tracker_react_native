@@ -19,12 +19,6 @@ export default function RootLayout() {
       }
     })
 
-    async function loadDB() {
-      //await cleanDB()
-      await openDB()
-      await printAllWorkouts()
-    }
-
     let isSyncing = false
 
     async function syncDataWithServer() {
@@ -38,18 +32,24 @@ export default function RootLayout() {
       }
     }
 
-    const unsubscribe = NetInfo.addEventListener(state => {
-      if (state.isConnected) {
-        console.log("Syncing sql with supabase...")
-        syncDataWithServer() 
-      }
-    })
+    async function init() {
+      await openDB()
+      //await cleanDB()
+      await printAllWorkouts()
+      await syncDataWithServer()
+    }
 
-    loadDB()
+    // const unsubscribe = NetInfo.addEventListener(state => {
+    //   if (state.isConnected) {
+    //     console.log("Syncing sql with supabase...")
+    //     syncDataWithServer() 
+    //   }
+    // })
 
+    init()
     return () => {
       authListener?.subscription.unsubscribe()
-      unsubscribe()
+      //unsubscribe()
     }
   }, [])
 
