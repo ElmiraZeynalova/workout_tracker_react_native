@@ -1,16 +1,18 @@
 import { StatusBar } from "react-native"
-import {useEffect} from 'react'
+import {useEffect, useRef} from 'react'
 import {openDB} from '@/src/sqlite/open_db'
 import {printAllWorkouts, cleanDB} from '@/src/sqlite/crud'
-import { supabase, syncWorkouts } from '@/src/supabase/crud'
+import { supabase, syncWorkouts, syncLocalDBWithServer } from '@/src/supabase/crud'
 import { useUserStore } from "@/src/store/user-store";
 import { Stack, Redirect } from 'expo-router'
 import NetInfo from '@react-native-community/netinfo'
+import { useForceRerenderStore } from "@/src/store/forceRerender"
 
 export default function RootLayout() {
   const setUserId = useUserStore((state) => state.setUserId)
   const userId = useUserStore((state) => state.userId)
-
+  const isSyncing = useRef(false)
+  const forceRerender = useForceRerenderStore(state => state.setRerender)
   useEffect(() => {
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
@@ -19,16 +21,16 @@ export default function RootLayout() {
       }
     })
 
-    let isSyncing = false
-
-    async function syncDataWithServer() {
-      if (isSyncing) return
-      isSyncing = true
+    async function syncData() {
+      if (isSyncing.current) return
+      isSyncing.current = true
       try {
         await syncWorkouts()
-        console.log("Synced with supabase!")
+        console.log("Synced sqlite with supabase!")
+        await syncLocalDBWithServer()
+        console.log("Synced supabase with sqlite!!")
       } finally {
-        isSyncing = false
+        isSyncing.current = false
       }
     }
 
@@ -36,7 +38,8 @@ export default function RootLayout() {
       await openDB()
       //await cleanDB()
       await printAllWorkouts()
-      await syncDataWithServer()
+      await syncData()
+      forceRerender()
     }
 
     // const unsubscribe = NetInfo.addEventListener(state => {

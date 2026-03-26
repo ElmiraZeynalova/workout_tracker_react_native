@@ -74,13 +74,11 @@ export async function getWorkoutId(date: string){
 export async function markWorkoutSynced(workoutId: string){
     const db = await openDB()
     await db.runAsync(`UPDATE workouts SET is_synced = 1 WHERE id = ?`, [workoutId])
-    console.log('workout marked synced!')
 }
 
 export async function markWorkoutUnsynced(workoutId: string){
     const db = await openDB()
     await db.runAsync(`UPDATE workouts SET is_synced = 0 WHERE id = ?`, [workoutId])
-    console.log('workout marked UNsynced!')
 }
 
 export async function getExercisesDataByDateAndId(date: string, exerciseId: string){
@@ -252,5 +250,4 @@ export async function deleteExercise(id: string){
         `DELETE FROM exercises WHERE id = ?;`,
         [id],
     );
-    console.log("exerrcise deleted")
 }

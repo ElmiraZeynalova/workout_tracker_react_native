@@ -38,7 +38,6 @@ export default function LogWorkout() {
               .filter(e => e.sets.length > 0)
 
           await saveWorkout(currentWorkoutDate, cleanedExercises, 0)
-          console.log("Saved workout to SQLITE")
           clearWorkoutStore()
           router.navigate('/')
     

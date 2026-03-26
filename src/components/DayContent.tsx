@@ -5,15 +5,16 @@ import LoggedExercise from '@/src/components/LoggedExercise'
 import {Text, StyleSheet, View, Pressable, ScrollView} from 'react-native'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import { useRouter } from 'expo-router'
-
+import { useForceRerenderStore } from "../store/forceRerender"
 export default function DayContent({date}: {date: string}){
     const [workout, setWorkout] = useState<Exercise[] | null>(null)
     const [loading, setLoading] = useState(true)
     const router = useRouter();
+    const rerender = useForceRerenderStore(state => state.rerender)
     
     useEffect(() => {
         loadWorkout()
-    }, [])
+    }, [rerender])
 
     async function loadWorkout(){
         const data = await getAllWorkoutExercisesDataByDate(date)

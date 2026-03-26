@@ -26,7 +26,6 @@ export default function EditExercise(){
     }, [])
 
     async function handleSave(){
-        console.log("Editing....")
         const cleanExerciseData = {
             exerciseId: editingExercise.exerciseId,
             exerciseName: editingExercise.exerciseName,
@@ -36,12 +35,9 @@ export default function EditExercise(){
                     .flatMap(s => s.weight === null ? {...s, weight: 0} : s)
         }
         if(cleanExerciseData.sets.length === 0) {
-            console.log("Exercise has no sets now")
             await deleteExercise(exerciseId)
-            console.log("Exercise deleted!")
         }else{
             await saveWorkout(workoutDate, [cleanExerciseData], 0)
-            console.log("Exercise edited!")
         }
         try {
             const workoutId = await getWorkoutId(workoutDate)

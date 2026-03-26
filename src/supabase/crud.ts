@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useUserStore } from "@/src/store/user-store"
 import type {Exercise, SetInfo} from '@/src/store/workout-store'
 import Constants from 'expo-constants'
-import {getUnsyncedWorkouts, markWorkoutSynced} from "@/src/sqlite/crud"
+import {getUnsyncedWorkouts, markWorkoutSynced, getWorkoutId, getAllWorkoutExercisesDataByDate, saveWorkout} from "@/src/sqlite/crud"
 const supabaseUrl = Constants.expoConfig?.extra?.EXPO_PUBLIC_SUPABASE_URL
 const supabaseKey = Constants.expoConfig?.extra?.EXPO_PUBLIC_SUPABASE_KEY
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -40,12 +40,10 @@ export async function verifyOtp(email: string, code: string) {
 export async function syncWorkouts(){
     const userId = useUserStore.getState().userId
     const workoutsData = await getUnsyncedWorkouts()
-    console.log(workoutsData)
     if(!workoutsData) return 
 
     for(const w of workoutsData){
         if(w.exercises.length === 0){
-            console.log("updated workout is empty? so i'm deleting it...")
             const {data: workoutData, error: workoutError} = await supabase
                 .from('workouts')
                 .select('id')
@@ -69,7 +67,6 @@ export async function syncWorkouts(){
                 await supabase.from('workouts').delete().eq('id', workoutId)
             }
             await markWorkoutSynced(w.workoutId)
-            console.log("delted and marked synced")
             continue
         }
         const { data: workout, error: upsertWorkoutError } = await supabase
@@ -128,4 +125,46 @@ export async function syncWorkouts(){
         await markWorkoutSynced(w.workoutId)
     }
     return {error: null}
+}
+
+export async function syncLocalDBWithServer(){
+    const userId = useUserStore.getState().userId
+    const {data: workoutData, error: workoutError} = await supabase
+        .from('workouts')
+        .select()
+        .eq('user_id', userId)
+     if(workoutError) return { error: workoutError }
+    console.log(workoutData)
+    const missingWorkouts = []
+    for(const w of workoutData){
+        const workoutId = await getWorkoutId(w.date)
+        if(!workoutId) missingWorkouts.push(w)
+    }
+    console.log(missingWorkouts)
+    const workoutsIds = missingWorkouts.map(w => w.id)
+    const {data: exercisesData, error: getExerciseError} = await supabase
+        .from('exercises')
+        .select()
+        .in('workout_id', workoutsIds)
+    if(getExerciseError) return { error: getExerciseError }
+    console.log(exercisesData)
+    const exercisesIds = exercisesData?.map(e => e.id)
+
+    const {data: setsData, error: setsError} = await supabase
+        .from('sets')
+        .select()
+        .in('exercise_id', exercisesIds)
+    if(setsError) return { error: setsError }
+    console.log(setsData)
+    for (const w of missingWorkouts) {
+        const exercises: Exercise[] = exercisesData
+            .filter(e => e.workout_id === w.id)
+            .map(e => ({
+                exerciseId: e.id,
+                exerciseName: e.name,
+                sets: setsData.filter(s => s.exercise_id === e.id)
+            }))
+        console.log(exercises)
+        await saveWorkout(w.date, exercises, 1)
+    }
 }

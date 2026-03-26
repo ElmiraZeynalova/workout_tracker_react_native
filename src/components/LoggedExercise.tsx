@@ -79,9 +79,9 @@ export default function LoggedExercise({date, exercise, onDelete}: {date: string
                 <View style={styles.setRows}>
                     {sets.map(set => (
                         <View key={set.id} style={styles.setRow}>
-                            <Text style={styles.rowInfo}>{set.id}</Text>
-                            <Text style={styles.rowNumbers}>{set.weight} <Text style={styles.rowInfo}>kg</Text> </Text>
-                            <Text style={styles.rowNumbers}>{set.reps} <Text style={styles.rowInfo}>reps</Text> </Text>
+                            <Text style={[styles.rowInfo, {width: 20}]}>{set.id}</Text>
+                            <Text style={[styles.rowNumbers, {width: 80, textAlign: 'right'}]}>{set.weight} <Text style={styles.rowInfo}>kgs</Text> </Text>
+                            <Text style={[styles.rowNumbers, {width: 80, textAlign: 'right'}]}>{set.reps} <Text style={styles.rowInfo}>reps</Text> </Text>
                         </View>
                     ))}
                 </View>
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
         gap: 12
     },
     exerciseName: {
-        fontWeight: 600,
+        fontWeight: 400,
         fontSize: 18,
         flexGrow: 1,
     },
@@ -122,14 +122,14 @@ const styles = StyleSheet.create({
 
     },
     rowInfo: {
-        color: '#6d6d6d',
-        fontWeight: 500,
+        color: '#7c7c7c',
+        fontWeight: 400,
         fontSize: 16,
     },
     rowNumbers: {
-        color: 'black',
-        fontWeight: 600,
-        fontSize: 17,
+        color: '#444444',
+        fontWeight: 500,
+        fontSize: 19,
     },
     overlay: {
         flex: 1,
