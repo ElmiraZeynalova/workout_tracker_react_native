@@ -16,11 +16,11 @@ export default function Index() {
     <>
       <Stack.Screen options={{
           headerLeft: () => 
-            <Pressable onPress={() => router.navigate('/log-workout')} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}>
+            <Pressable testID="plus-btn" onPress={() => router.navigate('/log-workout')} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}>
               <AntDesign name="plus" size={24} color="black" />
             </Pressable>,
           headerRight: () => 
-              <Pressable onPress={() => router.navigate('/calendar')} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}>
+              <Pressable testID="calendar-btn" onPress={() => router.navigate('/calendar')} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}>
                 <MaterialCommunityIcons name="calendar-month-outline" size={24} color="black" />
               </Pressable>,
           headerTitle: dayjs(date).format("MMMM D"),

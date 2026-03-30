@@ -6,7 +6,11 @@
     "version": "1.0.0",
     "extra": {
       "EXPO_PUBLIC_SUPABASE_URL": "https://wxdhjdmxwollqlsabmpi.supabase.co",
-      "EXPO_PUBLIC_SUPABASE_KEY": "sb_publishable_LxTTbCj0MmOV5JD5v-ltJw_kA0ZrmaV"
+      "EXPO_PUBLIC_SUPABASE_KEY": "sb_publishable_LxTTbCj0MmOV5JD5v-ltJw_kA0ZrmaV",
+      "router": {},
+      "eas": {
+        "projectId": "65c49629-f913-4c79-bc19-5eac27d10569"
+      }
     },
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

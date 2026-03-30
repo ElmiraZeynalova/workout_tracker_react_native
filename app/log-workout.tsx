@@ -56,11 +56,11 @@ export default function LogWorkout() {
     <>
       <Stack.Screen options={{
           headerLeft: () => 
-            <Pressable onPress={() => setShowDiscardModal(true)} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}>
+            <Pressable testID="home-from-logWrk-btn" onPress={() => setShowDiscardModal(true)} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}>
               <Entypo name="chevron-left" size={24} color="black" />
             </Pressable>,
           headerRight: () => 
-              <Pressable onPress={handleFinish} style={({ pressed }) => [styles.headerBtn, pressed && styles.pressed]}>
+              <Pressable testID="finish-btn" onPress={handleFinish} style={({ pressed }) => [styles.headerBtn, pressed && styles.pressed]}>
                 <Text style={{color: '#FF5526', fontSize: 12, fontWeight: 500, }}>Finish</Text>
               </Pressable>,
           headerTitle: 'Log Workout',
@@ -80,10 +80,10 @@ export default function LogWorkout() {
         <Pressable style={styles.overlay} onPress={() => setShowDiscardModal(false)}>
           <View style={styles.modalWindow}>
               <Text style={[styles.modalWindowText, {borderBottomColor: '#c7c7c76a', borderBottomWidth: 0.3}]}>Are you sure you want to discard this workout?</Text>
-                <Pressable onPress={handleDiscard} style={({ pressed }) => [styles.modalBtn, pressed && styles.pressed, {borderBottomColor: '#c7c7c76a', borderBottomWidth: 0.3}]}>
+                <Pressable testID="discardWrk-btn" onPress={handleDiscard} style={({ pressed }) => [styles.modalBtn, pressed && styles.pressed, {borderBottomColor: '#c7c7c76a', borderBottomWidth: 0.3}]}>
                   <Text style={styles.modalBtnText}>Discard Workout</Text>
                 </Pressable>
-                <Pressable onPress={() => setShowDiscardModal(false)} style={({ pressed }) => [styles.modalBtn, pressed && styles.pressed]}>
+                <Pressable testID="cancelDiscardWrk-btn" onPress={() => setShowDiscardModal(false)} style={({ pressed }) => [styles.modalBtn, pressed && styles.pressed]}>
                   <Text style={styles.modalCancelBtnText}>Cancel</Text>
                 </Pressable>
           </View>
@@ -100,7 +100,7 @@ export default function LogWorkout() {
           <View style={styles.modalWindow}>
               {exerciseCards.length === 0 && <Text style={[styles.modalWindowText, {borderBottomColor: '#c7c7c76a', borderBottomWidth: 0.3}]}>Add an exercise</Text>}
               {(exerciseCards.length > 0 && notValid) && <Text style={[styles.modalWindowText, {borderBottomColor: '#c7c7c76a', borderBottomWidth: 0.3}]}>Your workout has no set values</Text>}
-              <Pressable onPress={() => setShowFinishModal(false)} style={({ pressed }) => [styles.modalBtn, pressed && styles.pressed]}>
+              <Pressable testID="ok-modal-btn" onPress={() => setShowFinishModal(false)} style={({ pressed }) => [styles.modalBtn, pressed && styles.pressed]}>
                 <Text style={styles.modalBtnText}>Ok</Text>
               </Pressable>
           </View>
@@ -112,7 +112,7 @@ export default function LogWorkout() {
           <DumbbellIcon width={70} height={70}/>
           <Text style={{color: 'black', fontSize: 22, fontWeight: 500}}>Get started</Text>
           <Text style={{color: '#00000072', fontSize: 18, fontWeight: 400, marginBottom: 20}}>Add an exercise to start your workout</Text>
-          <Pressable  onPress={() => router.navigate('/exercises-list')} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
+          <Pressable testID="addExr-logScreen-noExrScreen-btn" onPress={() => router.navigate('/exercises-list')} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
             <AntDesign name="plus" size={20} color="white" />
             <Text style={styles.btnText}>Add Exercise</Text>
           </Pressable>
@@ -122,7 +122,7 @@ export default function LogWorkout() {
       {exerciseCards.length > 0 && 
         <ScrollView contentContainerStyle={styles.scrollView}>
           {exerciseCards}
-          <Pressable  onPress={() => router.navigate('/exercises-list')} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
+          <Pressable testID="addExr-logScreen-withExrScreen-btn" onPress={() => router.navigate('/exercises-list')} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
             <AntDesign name="plus" size={20} color="white" />
             <Text style={styles.btnText}>Add Exercise</Text>
           </Pressable>

@@ -35,7 +35,7 @@ export default function ExercisesList(){
             if (!Icon) return null
             return(
             <View key={e.exerciseName} >
-                <Pressable style={({ pressed }) => [styles.exercise, pressed && styles.pressed]} onPress={() => handleExerciseChoice(e.exerciseName)}>
+                <Pressable testID={`exercise-item-${e.exerciseName}`} style={({ pressed }) => [styles.exercise, pressed && styles.pressed]} onPress={() => handleExerciseChoice(e.exerciseName)}>
                     {chosenExercises.includes(e.exerciseName) && <View style={styles.selectedExercise}></View>}
                     <Icon width={55} height={55}/>
                     <View style={styles.exerciseInfo}>
@@ -64,8 +64,9 @@ export default function ExercisesList(){
      
             <View style={styles.searchBar}>
                 <FontAwesome6 style={styles.glass} name="magnifying-glass" size={18} color="#a7a7a7" />
-                <TextInput
+                <TextInput testID="search-input"
                     placeholder="Search exercise"
+                    placeholderTextColor="#7a7a7a"
                     onChangeText={setSearch}
                     value={search}
                     style={styles.input}
@@ -76,7 +77,7 @@ export default function ExercisesList(){
                 {exercisesList}
             </ScrollView>
             {chosenExercises.length > 0 && 
-                <Pressable onPress={saveChosenExercises} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
+                <Pressable testID="addExr-listScreen-btn" onPress={saveChosenExercises} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
                     <Text style={styles.btnText}>{chosenExercises.length === 1 ? "Add 1 exercise" : `Add ${chosenExercises.length} exercises`}</Text>
                 </Pressable>
             }
@@ -90,20 +91,25 @@ const styles = StyleSheet.create({
         position: 'sticky',
         paddingHorizontal: 18,
         zIndex: 1,
-        marginBottom: 12
+        marginBottom: 12,
     },
     input: {
         backgroundColor: 'white',
         borderRadius: 50,
         paddingVertical: 12,
         paddingLeft: 46,
-        paddingRight: 10
+        paddingRight: 10,
+        elevation: 4,          
+        shadowColor: '#787878',    
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
 
     },
     glass: {
         position: 'absolute',
         zIndex: 2,
-        top: 14,
+        top: 13,
         left: 36
     },
     pressed: {

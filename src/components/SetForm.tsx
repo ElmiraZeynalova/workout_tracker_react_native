@@ -24,21 +24,25 @@ export default function SetForm({idx, checked, onToggle, reps, weight, updateRep
             <View style={styles.setForm}>
                 <Text style={{fontWeight: 500}}>{idx + 1}</Text>
                 <TextInput
+                    testID="weight-input"
                     style={styles.input}
                     onChangeText={(n) => updateWeight(Number(n))}
                     value={weight != null ? String(weight) : ''}
                     placeholder="0"
+                    placeholderTextColor="#7a7a7a"
                     keyboardType="numeric"
                 />
                 <TextInput
+                    testID="reps-input"
                     style={styles.input}
                     onChangeText={(n) => updateReps(Number(n))}
                     value={reps != null ? String(reps) : ''}
                     placeholder="0"
+                    placeholderTextColor="#7a7a7a"
                     keyboardType="numeric"
                 />
 
-                <Pressable onPress={onToggle} style={[styles.checkbox, checked && styles.checked]}>
+                <Pressable testID="checkbox" onPress={onToggle} style={[styles.checkbox, checked && styles.checked]}>
                     {checked && <AntDesign name="check" size={14} color="white" />}
                 </Pressable>
             </View>

@@ -29,13 +29,13 @@ export default function LogExercise({exerciseId}:{exerciseId: string}){
             <View style={styles.top}>
                 <Icon width={40} height={40}/>
                 <Text style={styles.exerciseName}>{exercise?.exerciseName}</Text>
-                <Pressable style={({ pressed }) => [pressed && styles.pressed]} onPress={() => deleteExercise(exerciseId)}>
+                <Pressable testID="cross-btn" style={({ pressed }) => [pressed && styles.pressed]} onPress={() => deleteExercise(exerciseId)}>
                     <Entypo name="cross" size={24} color="#858585" />
                 </Pressable>
             </View>
                
             <View style={styles.forms}>{setForms}</View>  
-            <Pressable  onPress={handleAddSetBtnClick} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
+            <Pressable testID="addSet-btn" onPress={handleAddSetBtnClick} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
                 <Text style={{color: '#FF5526', fontSize: 12, fontWeight: 500}}>Add Set</Text>
             </Pressable>
         </View>

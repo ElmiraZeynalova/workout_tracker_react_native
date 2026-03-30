@@ -30,7 +30,7 @@ export default function DayContent({date}: {date: string}){
             {!loading && (workout && workout.length === 0) && 
                 <>
                     <Text style={styles.text}>Workout Log Is Empty</Text>
-                    <Pressable onPress={() => router.navigate('/log-workout')} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
+                    <Pressable testID="newWrk-btn" onPress={() => router.navigate('/log-workout')} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
                         <AntDesign name="plus" size={28} color="#FF5526" />
                         <Text style={styles.btnText}>Start New Workout</Text>
                     </Pressable>
