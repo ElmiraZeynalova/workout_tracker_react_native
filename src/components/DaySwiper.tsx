@@ -1,6 +1,6 @@
 import {View, Text, StyleSheet} from 'react-native'
 import PagerView from 'react-native-pager-view';
-import {useDateStore} from '../store/date-store'
+import {useDateStore} from '../zustand-store/date-store'
 import {useState, useMemo, useRef, useEffect} from 'react'
 import dayjs from 'dayjs'
 import DayContent from './DayContent';
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     },
     slide: {
         flex: 1,
-        padding: 12,
+        padding: 7,
 
     },
 

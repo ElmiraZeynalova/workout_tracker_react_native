@@ -1,67 +1,68 @@
 import { StatusBar } from "react-native"
-import {useEffect, useRef} from 'react'
+import {useEffect, useRef, useCallback} from 'react'
 import {openDB} from '@/src/sqlite/open_db'
-import {printAllWorkouts, cleanDB} from '@/src/sqlite/crud'
-import { supabase, syncWorkouts, syncLocalDBWithServer } from '@/src/supabase/crud'
-import { useUserStore } from "@/src/store/user-store";
+import {cleanDB, getAllWorkouts, deleteTables} from '@/src/sqlite/crud'
+
+import {createTables} from '@/src/sqlite/create_tables'
+import { supabase, syncServerWithSQLite, syncSqliteWithServer } from '@/src/supabase/crud'
+import { useUserStore } from "@/src/zustand-store/user-store";
+import { useRenderWorkoutOnScreenStore } from "@/src/zustand-store/render-workout-store"
 import { Stack, Redirect } from 'expo-router'
 import NetInfo from '@react-native-community/netinfo'
-import { useForceRerenderStore } from "@/src/store/forceRerender"
 
 export default function RootLayout() {
   const setUserId = useUserStore((state) => state.setUserId)
+  const setAllWorkouts = useRenderWorkoutOnScreenStore((state) => state.setAll)
   const userId = useUserStore((state) => state.userId)
   const isSyncing = useRef(false)
-  const forceRerender = useForceRerenderStore(state => state.setRerender)
-  useEffect(() => {
+  const wasOffline = useRef(false)
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
-      if (session) {
-        setUserId(session.user.id)
-      }
-    })
-
-    async function syncData() {
+  const init = useCallback(async () => {
       if (isSyncing.current) return
       isSyncing.current = true
       try {
-        await syncWorkouts()
-        console.log("Synced sqlite with supabase!")
-        await syncLocalDBWithServer()
-        console.log("Synced supabase with sqlite!!")
+          const workouts = await getAllWorkouts()
+          setAllWorkouts(workouts)
+          await syncServerWithSQLite()
+          await syncSqliteWithServer()
+      } catch (err) {
+          console.warn("Sync failed", err)
       } finally {
-        isSyncing.current = false
+          isSyncing.current = false
       }
-    }
-
-    async function init() {
-      await openDB()
-      //await cleanDB()
-      await printAllWorkouts()
-      await syncData()
-      forceRerender()
-    }
-
-    // const unsubscribe = NetInfo.addEventListener(state => {
-    //   if (state.isConnected) {
-    //     console.log("Syncing sql with supabase...")
-    //     syncDataWithServer() 
-    //   }
-    // })
-
-    init()
-    return () => {
-      authListener?.subscription.unsubscribe()
-      //unsubscribe()
-    }
   }, [])
+
+  useEffect(() => {
+      const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
+          if (session) {
+              setUserId(session.user.id)
+              init()
+          }
+      })
+
+    const unsubscribeNetInfo = NetInfo.addEventListener(state => {
+        if (!state.isConnected) {
+            wasOffline.current = true
+        return
+        }
+
+        if (state.isConnected && wasOffline.current) {
+            wasOffline.current = false
+            init()
+        }
+    })
+
+      return () => {
+          authListener?.subscription.unsubscribe()
+          unsubscribeNetInfo()
+      }
+  }, [init])
+
 
   return (
     <>
       <StatusBar barStyle="dark-content" backgroundColor='#F3F3F3' />
-      <Stack>
-
-      </Stack>
+      <Stack></Stack>
       {userId ? <Redirect href="/" /> : <Redirect href="/log-in" />}
     </>
   )

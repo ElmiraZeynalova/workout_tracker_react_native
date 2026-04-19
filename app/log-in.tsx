@@ -1,4 +1,4 @@
-import { useUserStore } from "@/src/store/user-store"
+import { useUserStore } from "@/src/zustand-store/user-store"
 import { signInUser, verifyOtp } from "@/src/supabase/crud"
 import { useState, useEffect } from 'react'
 import { View, Pressable, Text, TextInput, StyleSheet } from 'react-native'
@@ -69,6 +69,8 @@ export default function LogIn() {
                             <FontAwesome6 name="envelope" size={20} color="black" />
                             <TextInput
                                 testID="email-input"
+                                accessible={true} 
+                                accessibilityLabel="email-input"
                                 placeholder="Email"
                                 placeholderTextColor="#7a7a7a"
                                 value={email}
@@ -89,6 +91,8 @@ export default function LogIn() {
 
                         <Pressable
                             testID="login-button"
+                            accessible={true} 
+                            accessibilityLabel="login-button"
                             disabled={!email || loading}
                             onPress={handleLogin}
                             style={({ pressed }) => [styles.button, pressed && styles.pressed, {backgroundColor: (!email || loading) ? '#ccc' : '#FF5526'}]}
@@ -111,6 +115,8 @@ export default function LogIn() {
                             <Feather name="lock" size={20} color="black" />
                             <TextInput
                                 testID="otp-input"
+                                accessible={true} 
+                                accessibilityLabel="otp-input"
                                 placeholder="6-digit code"
                                 placeholderTextColor="#7a7a7a"
                                 value={code}
@@ -132,6 +138,8 @@ export default function LogIn() {
 
                         <Pressable
                             testID="verify-btn"
+                            accessible={true} 
+                            accessibilityLabel="verify-btn"
                             disabled={code.length !== 6 || loading}
                             onPress={handleVerify}
                             style={({ pressed }) => [styles.button, pressed && styles.pressed, {backgroundColor: (code.length !== 6 || loading) ? '#ccc' : '#FF5526'}]}
@@ -148,6 +156,8 @@ export default function LogIn() {
 
                         <Pressable
                             testID="back-btn"
+                            accessible={true} 
+                            accessibilityLabel="back-btn"
                             onPress={() => {
                                 setStep('email')
                                 setCode('')

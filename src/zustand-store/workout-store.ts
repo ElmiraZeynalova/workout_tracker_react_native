@@ -3,8 +3,8 @@ import * as Crypto from 'expo-crypto'
 
 export type SetInfo = {
     setId: string
-    reps: number | null
-    weight?: number | null
+    reps: number
+    weight: number
     checked: boolean
 }
 
@@ -19,12 +19,10 @@ type WorkoutStore = {
     addNewExercises: (newExercisesNames: string[]) => void
     deleteExercise: (exerciseId: string) => void
     addNewSet: (exerciseId: string) => void
-    deleteSet: (exerciseId: string, setIdx: number) => void
-    updateSet: (exerciseId: string, setIdx: number, fieldName: string, value: number) => void
-    toggleChecked: (exerciseId: string, setIdx: number) => void
+    deleteSet: (exerciseId: string, setId: string) => void
+    updateSet: (exerciseId: string, setId: string, fieldName: "reps" | "weight", value: number) => void
+    toggleChecked: (exerciseId: string, setId: string) => void
     clearWorkout: () => void
-    loadExerciseForEdit: (exercise: Exercise) => void
-
 }
 
 export const useWorkoutStore = create<WorkoutStore>((set) => ({
@@ -33,7 +31,7 @@ export const useWorkoutStore = create<WorkoutStore>((set) => ({
         set(state => ({
             exercises: [...state.exercises, 
                 ...newExercisesNames.map(newName => (
-                {exerciseId: Crypto.randomUUID(), exerciseName: newName, sets: [{setId: Crypto.randomUUID(), reps: 5, weight: null, checked: true}]}
+                {exerciseId: Crypto.randomUUID(), exerciseName: newName, sets: [{setId: Crypto.randomUUID(), reps: 5, weight: 0, checked: true}]}
                 ))
             ]
         })),
@@ -45,53 +43,46 @@ export const useWorkoutStore = create<WorkoutStore>((set) => ({
         set(state => ({
             exercises: state.exercises.map(e => 
                 e.exerciseId === exerciseId 
-                    ? {...e, sets: [...e.sets, {setId: Crypto.randomUUID(), reps: 15, weight: null, checked: true}]}
+                    ? {...e, sets: [...e.sets, {setId: Crypto.randomUUID(), reps:5, weight: 0, checked: true}]}
                     : e
             )
         })),
 
-    deleteSet: (exerciseId, setIdx) => 
+    deleteSet: (exerciseId, setId) => 
         set(state => ({
             exercises: state.exercises.map(e => 
                 e.exerciseId === exerciseId 
-                    ? {...e, sets: e.sets.filter((_, i) => i !== setIdx)}
+                    ? {...e, sets: e.sets.filter(s => s.setId !== setId)}
                     : e
             )
         })),
 
-    updateSet: (exerciseId, setIdx, fieldName, value) => 
+    updateSet: (exerciseId, setId, fieldName, value) => 
         set(state => ({
             exercises: state.exercises.map(e => 
                 e.exerciseId === exerciseId 
                     ? {
                         ...e, 
-                        sets: e.sets.map((set, idx) => 
-                            idx === setIdx ? {...set, [fieldName]: value} : set
+                        sets: e.sets.map((set) => 
+                            set.setId === setId ? {...set, [fieldName]: value} : set
                     )
                 }
                     : e
             )
         })),
-
-    toggleChecked: (exerciseId, setIdx) => 
+    toggleChecked: (exerciseId, setId) => 
         set(state => ({
             exercises: state.exercises.map(e =>
                 e.exerciseId === exerciseId
                 ? {
-                    ...e, sets: e.sets.map((set, idx) =>
-                    idx === setIdx ? {...set, checked: !set.checked} : set
+                    ...e, sets: e.sets.map((set) =>
+                    set.setId === setId ? {...set, checked: !set.checked} : set
                 )
             }
                 : e
             )
         })),
-
     clearWorkout: () => 
-        set({exercises: []}),
+        set({exercises: []})
 
-    loadExerciseForEdit: (exercise: Exercise) => 
-        set((state) => ({
-            exercises: [exercise]
-    }))
-    
 }))

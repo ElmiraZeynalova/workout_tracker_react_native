@@ -1,4 +1,3 @@
-import type {Exercise} from '@/src/store/workout-store'
 import {Text, StyleSheet, View, Pressable, Modal} from 'react-native'
 import {useState} from 'react'
 import Entypo from '@expo/vector-icons/Entypo';
@@ -6,10 +5,25 @@ import Fontisto from '@expo/vector-icons/Fontisto';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { exerciseIcons } from '@/assets/icons'
 import exercises from '@/src/exercises.json'
-import {deleteExercise, getWorkoutId, markWorkoutUnsynced} from '@/src/sqlite/crud'
 import { useRouter } from 'expo-router';
+import { useRenderWorkoutOnScreenStore } from '../zustand-store/render-workout-store';
+import { deleteExerciseById, markWorkoutUnsynced } from '../sqlite/crud';
+import { syncServerWithSQLite } from '../supabase/crud';
 
-export default function LoggedExercise({date, exercise, onDelete}: {date: string, exercise: Exercise, onDelete: () => void}){
+type SetInfo = {
+    setId: string
+    reps: number | null
+    weight?: number | null
+}
+
+type Exercise = {
+    exerciseId: string
+    exerciseName: string
+    sets: SetInfo[]
+}
+
+export default function LoggedExerciseCard({date, exercise}: {date: string, exercise: Exercise}){
+    const removeExercise = useRenderWorkoutOnScreenStore((state) => state.removeExercise)
     const [showModal, setShowModal] = useState<boolean>(false)
     const router = useRouter();
     const sets = exercise.sets.map((set, idx) => (
@@ -24,15 +38,15 @@ export default function LoggedExercise({date, exercise, onDelete}: {date: string
     if (!Icon) return null
 
     async function handleDeleteExr(){
-        await deleteExercise(exercise.exerciseId)
+        removeExercise(date, exercise.exerciseId)
+        await deleteExerciseById(date, exercise.exerciseId)
         try {
-            const workoutId = await getWorkoutId(date)
-            if(workoutId) await markWorkoutUnsynced(workoutId)
+            await markWorkoutUnsynced(date)
         } catch(e) {
             console.warn("Failed to mark workout unsynced:", e)
         }
         setShowModal(false)
-        onDelete()
+        await syncServerWithSQLite()
     }
 
     async function handleEditExr(){
@@ -68,7 +82,7 @@ export default function LoggedExercise({date, exercise, onDelete}: {date: string
                 </Pressable>
             </Modal>
             
-            <View style={styles.view}>
+            <View testID={`logged-exercise-card-${exercise.exerciseName}`} accessible={true} accessibilityLabel={`logged-exercise-card-${exercise.exerciseName}`} style={styles.view}>
                 <View style={styles.top}>
                     <Icon width={40} height={40}/>
                     <Text style={styles.exerciseName}>{exercise.exerciseName}</Text>
@@ -80,8 +94,8 @@ export default function LoggedExercise({date, exercise, onDelete}: {date: string
                     {sets.map(set => (
                         <View key={set.id} style={styles.setRow}>
                             <Text style={[styles.rowInfo, {width: 20}]}>{set.id}</Text>
-                            <Text style={[styles.rowNumbers, {width: 80, textAlign: 'right'}]}>{set.weight} <Text style={styles.rowInfo}>kgs</Text> </Text>
-                            <Text style={[styles.rowNumbers, {width: 80, textAlign: 'right'}]}>{set.reps} <Text style={styles.rowInfo}>reps</Text> </Text>
+                            <Text testID="loggedWeight" accessible={true} accessibilityLabel="loggedWeight" style={[styles.rowNumbers, {width: 80, textAlign: 'right'}]}>{set.weight} <Text style={styles.rowInfo}>kgs</Text> </Text>
+                            <Text testID="loggedReps" accessible={true} accessibilityLabel="loggedReps" style={[styles.rowNumbers, {width: 80, textAlign: 'right'}]}>{set.reps} <Text style={styles.rowInfo}>reps</Text> </Text>
                         </View>
                     ))}
                 </View>
@@ -98,6 +112,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 15,
         padding: 10,
+        marginVertical: 5,
+        marginHorizontal: 5,
+        shadowColor: "#00000053",
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.03,
+        shadowRadius: 14,
+        elevation: 4,
     },
     top: {
         flexDirection: 'row',
@@ -105,7 +126,7 @@ const styles = StyleSheet.create({
         gap: 12
     },
     exerciseName: {
-        fontWeight: 400,
+        fontWeight: 500,
         fontSize: 18,
         flexGrow: 1,
     },
@@ -129,7 +150,7 @@ const styles = StyleSheet.create({
     rowNumbers: {
         color: '#444444',
         fontWeight: 500,
-        fontSize: 19,
+        fontSize: 17,
     },
     overlay: {
         flex: 1,
@@ -147,32 +168,32 @@ const styles = StyleSheet.create({
     modalBtns: {
         flexDirection: 'column',
         backgroundColor: 'white',
-        gap: 20,
-        borderRadius: 10,
-        paddingVertical: 20,
-        marginBottom: 15
+        gap: 18,
+        borderRadius: 16,
+        paddingVertical: 18,
+        marginBottom: 18
     },
     modalBtn: {
         flexDirection: 'row', 
-        gap: 20, 
+        gap: 18, 
         alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: 18,
     },
     modalCancelBtn: {
         backgroundColor: 'white',
-        borderRadius: 10,
-        paddingVertical: 16,
+        borderRadius: 16,
+        paddingVertical: 15,
    
     },
     modalCancelBtnText: {
         color: '#FF5526', 
-        fontSize: 18, 
-        fontWeight: 600,
+        fontSize: 16, 
+        fontWeight: 500,
         textAlign: 'center',
     },
     modalBtnText: {
         color: 'black', 
-        fontSize: 18, 
+        fontSize: 16, 
         fontWeight: 400,
     }
 })

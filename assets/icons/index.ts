@@ -5,8 +5,8 @@ import Leg from './leg.svg'
 import { SvgProps } from 'react-native-svg'
 
 export const exerciseIcons:  Record<string, React.FC<SvgProps>> = {
-    'squat': Leg,
+    'squat': Dumbbell,
     'push-up': Dumbbell,
     'pull-up': Dumbbell,
-    'bicep': Bicep
+    'bicep': Dumbbell
 }

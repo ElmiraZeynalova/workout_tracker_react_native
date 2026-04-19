@@ -2,28 +2,54 @@ import Entypo from '@expo/vector-icons/Entypo';
 import {View, Pressable, Text, StyleSheet, ScrollView} from "react-native";
 import { Stack} from "expo-router";
 import { useRouter } from 'expo-router';
-import {getExercisesDataByDateAndId,saveWorkout, deleteExercise, getWorkoutId, markWorkoutUnsynced} from '@/src/sqlite/crud'
 import { useLocalSearchParams } from 'expo-router'
 import {useEffect} from 'react'
-import { useDateStore } from "@/src/store/date-store";
-import { useWorkoutStore } from '@/src/store/workout-store';
-import LogExercise from '@/src/components/LogExercise'
+import { useDateStore } from "@/src/zustand-store/date-store";
+import { useEditExerciseStore } from '@/src/zustand-store/edit-exercise-store';
+import EditExerciseCard from '@/src/components/EditExerciseCard'
+import {useRenderWorkoutOnScreenStore} from '@/src/zustand-store/render-workout-store'
+import { deleteExerciseById, editExercise, markWorkoutUnsynced } from '@/src/sqlite/crud';
+import { syncServerWithSQLite } from '@/src/supabase/crud';
+
+type SetInfo = {
+    setId: string
+    reps: number 
+    weight: number
+    checked: boolean
+}
+
+type Exercise = {
+    exerciseId: string
+    exerciseName: string
+    sets: SetInfo[]
+}
 
 export default function EditExercise(){
     const { exerciseId } = useLocalSearchParams<{ exerciseId: string }>()
     const router = useRouter()
     const workoutDate = useDateStore(state => state.selectedDate)
-    const loadExerciseForEdit = useWorkoutStore(state => state.loadExerciseForEdit)
-    const editingExercise = useWorkoutStore((state) => state.exercises[0])
-    const clearWorkoutStore = useWorkoutStore((state) => state.clearWorkout) 
+    const setExerciseForEdit = useEditExerciseStore(state => state.setExerciseForEdit)
+    const editingExercise = useEditExerciseStore((state) => state.editingExercise)
+    const workout = useRenderWorkoutOnScreenStore((state) => state.workouts[workoutDate])
+    const exercise = workout?.exercises.find(e => e.exerciseId === exerciseId)
+    const removeExercise = useRenderWorkoutOnScreenStore((state) => state.removeExercise)
+    const updateExercise = useRenderWorkoutOnScreenStore((state) => state.updateExercise)
 
     useEffect(() => {
-        const loadExercise = async() => {
-            const data = await getExercisesDataByDateAndId(workoutDate, exerciseId)
-            if(data) loadExerciseForEdit(data)
+        if (!exercise) return
+
+        const formattedExercise: Exercise = {
+            ...exercise,
+            sets: exercise.sets.map(s => ({
+                setId: s.setId,
+                reps: s.reps,
+                weight: s.weight,
+                checked: true
+            }))
         }
-        loadExercise()
-    }, [])
+
+        setExerciseForEdit(formattedExercise)
+    }, [exercise?.exerciseId])
 
     async function handleSave(){
         const cleanExerciseData = {
@@ -31,26 +57,27 @@ export default function EditExercise(){
             exerciseName: editingExercise.exerciseName,
             sets: editingExercise.sets
                     .filter(s => s.checked === true)
+                    .map(s => ({setId: s.setId, reps: s.reps, weight: s.weight}))
                     .filter(s => s.reps !== null && s.reps > 0)
-                    .flatMap(s => s.weight === null ? {...s, weight: 0} : s)
+                    .map(s => s.weight === null ? {...s, weight: 0} : s)
         }
         if(cleanExerciseData.sets.length === 0) {
-            await deleteExercise(exerciseId)
+            removeExercise(workoutDate, cleanExerciseData.exerciseId)
+            await deleteExerciseById(workoutDate, exerciseId)
         }else{
-            await saveWorkout(workoutDate, [cleanExerciseData], 0)
+            updateExercise(workoutDate, cleanExerciseData)
+            await editExercise(workoutDate, cleanExerciseData)
         }
         try {
-            const workoutId = await getWorkoutId(workoutDate)
-            if(workoutId) await markWorkoutUnsynced(workoutId)
+            await markWorkoutUnsynced(workoutDate)
         } catch(e) {
             console.warn("Failed to mark workout unsynced:", e)
         }
-        clearWorkoutStore()
         router.navigate('/')
+        syncServerWithSQLite().catch(console.warn)
     }
 
     function handleExitEditPage(){
-        clearWorkoutStore()
         router.navigate('/')
     }
     return(
@@ -72,7 +99,7 @@ export default function EditExercise(){
                 },
             }} />
             <ScrollView contentContainerStyle={styles.scrollView}>
-                <LogExercise exerciseId={exerciseId}/>
+                <EditExerciseCard/>
             </ScrollView>
             
 
@@ -94,6 +121,6 @@ const styles = StyleSheet.create({
   scrollView:{
     backgroundColor: '#F3F3F3',
     flexDirection: 'column',
-    paddingHorizontal: 12,
+    paddingHorizontal: 7,
   }
 })

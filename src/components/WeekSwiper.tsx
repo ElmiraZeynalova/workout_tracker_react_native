@@ -1,6 +1,6 @@
 import {View, Text, Pressable, StyleSheet, Animated} from 'react-native'
 import PagerView from 'react-native-pager-view';
-import {useDateStore} from '../store/date-store'
+import {useDateStore} from '../zustand-store/date-store'
 import {useState, useMemo, useRef, useEffect} from 'react'
 import dayjs from 'dayjs'
 import isoWeek from 'dayjs/plugin/isoWeek'
@@ -21,7 +21,7 @@ const generateWeeks = (centerWeek: any) => {
     })
 }
 
-export default function DateBar(){
+export default function WeekSwiper(){
     const selectedDate = useDateStore(state => state.selectedDate)
     const setSelectedDate = useDateStore(state => state.setSelectedDate)
     const pagerRef = useRef<PagerView>(null)

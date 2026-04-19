@@ -1,42 +1,30 @@
-import {getAllWorkoutExercisesDataByDate} from "@/src/sqlite/crud"
-import {useEffect, useState} from "react"
-import type {Exercise} from '@/src/store/workout-store'
-import LoggedExercise from '@/src/components/LoggedExercise'
+import LoggedExerciseCard from '@/src/components/LoggedExerciseCard'
 import {Text, StyleSheet, View, Pressable, ScrollView} from 'react-native'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import { useRouter } from 'expo-router'
-import { useForceRerenderStore } from "../store/forceRerender"
-export default function DayContent({date}: {date: string}){
-    const [workout, setWorkout] = useState<Exercise[] | null>(null)
-    const [loading, setLoading] = useState(true)
-    const router = useRouter();
-    const rerender = useForceRerenderStore(state => state.rerender)
-    
-    useEffect(() => {
-        loadWorkout()
-    }, [rerender])
+import { useRenderWorkoutOnScreenStore } from "../zustand-store/render-workout-store"
 
-    async function loadWorkout(){
-        const data = await getAllWorkoutExercisesDataByDate(date)
-        setWorkout(data) 
-        setLoading(false)
-    }
-    const loggedExercises = workout?.map(exercise => (
-        <LoggedExercise key={exercise.exerciseId} date={date} exercise={exercise} onDelete={loadWorkout}/>
+export default function DayContent({date}: {date: string}){
+    const router = useRouter()
+    const workout = useRenderWorkoutOnScreenStore((state) => state.workouts[date])
+
+    const loggedExercises = workout?.exercises?.map(exercise => (
+        <LoggedExerciseCard key={exercise.exerciseId} date={date} exercise={exercise}/>
     ))
 
+    const hasWorkout = workout && workout.exercises.length > 0
     return(
         <View style={styles.view}>
-            {!loading && (workout && workout.length === 0) && 
+            {!hasWorkout && 
                 <>
                     <Text style={styles.text}>Workout Log Is Empty</Text>
-                    <Pressable testID="newWrk-btn" onPress={() => router.navigate('/log-workout')} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
+                    <Pressable testID="newWrk-btn" accessible={true} accessibilityLabel="newWrk-btn" onPress={() => router.navigate('/log-workout')} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
                         <AntDesign name="plus" size={28} color="#FF5526" />
                         <Text style={styles.btnText}>Start New Workout</Text>
                     </Pressable>
                 </>
             }
-            {!loading && (workout && workout.length > 0) && <ScrollView  contentContainerStyle={styles.exercises}>{loggedExercises}</ScrollView>}
+            {hasWorkout && <ScrollView  contentContainerStyle={styles.exercises}>{loggedExercises}</ScrollView>}
         </View>
 
     )

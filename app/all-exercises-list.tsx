@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import { useWorkoutStore } from '@/src/store/workout-store'
+import { useWorkoutStore } from '@/src/zustand-store/workout-store'
 import {View, Text, StyleSheet, Pressable, ScrollView, TextInput} from 'react-native'
 import exercises from '@/src/exercises.json'
 import { Stack} from "expo-router"
@@ -8,12 +8,15 @@ import Entypo from '@expo/vector-icons/Entypo'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 import { exerciseIcons } from '@/assets/icons'
 
-export default function ExercisesList(){
+export default function AllExercisesList(){
     const router = useRouter();
     const [chosenExercises, setChosenExercises] = useState<string[]>([])
     const addNewExercises = useWorkoutStore((state) => state.addNewExercises)
     const [search, setSearch] = useState<string>("")
 
+    function handleSearch(text: string){
+        setSearch(text)
+    }
     function handleExerciseChoice(exerciseName: string){
         setChosenExercises((prev) => 
             prev.includes(exerciseName) 
@@ -27,15 +30,16 @@ export default function ExercisesList(){
         router.navigate('/log-workout')
     }  
 
-    const exercisesList = exercises
-        .filter(e => e.exerciseName.toLowerCase().includes(search.toLowerCase()))
-        .map(e => {
+    const hasInput = search.trim().length > 0
+    const filteredExercises = hasInput ? exercises.filter(e => e.exerciseName.toLowerCase().includes(search.toLowerCase())) : exercises
+    const exercisesList = filteredExercises.length > 0 ?
+        filteredExercises.map(e => {
             const exerciseIcon = exercises.find(ex => ex.exerciseName === e.exerciseName)?.iconKey
             const Icon = exerciseIcons[exerciseIcon || '']
             if (!Icon) return null
             return(
             <View key={e.exerciseName} >
-                <Pressable testID={`exercise-item-${e.exerciseName}`} style={({ pressed }) => [styles.exercise, pressed && styles.pressed]} onPress={() => handleExerciseChoice(e.exerciseName)}>
+                <Pressable testID={`exercise-item-${e.exerciseName}`} accessible={true} accessibilityLabel={`exercise-item-${e.exerciseName}`} style={({ pressed }) => [styles.exercise, pressed && styles.pressed]} onPress={() => handleExerciseChoice(e.exerciseName)}>
                     {chosenExercises.includes(e.exerciseName) && <View style={styles.selectedExercise}></View>}
                     <Icon width={55} height={55}/>
                     <View style={styles.exerciseInfo}>
@@ -44,7 +48,11 @@ export default function ExercisesList(){
                     </View>
                 </Pressable>
             </View>
-        )})
+        )}) : 
+            <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: 50, gap: 12}}>
+                <Text style={{fontSize: 20, fontWeight: 500, color: 'black', textAlign: 'center'}}>Can't find {search}</Text>
+                <Text style={{fontSize: 17, fontWeight: 400, color: '#7a7a7a', textAlign: 'center'}}>We don't have that exercise in our database yet.</Text>
+            </View>
 
     return(
         <>
@@ -65,9 +73,11 @@ export default function ExercisesList(){
             <View style={styles.searchBar}>
                 <FontAwesome6 style={styles.glass} name="magnifying-glass" size={18} color="#a7a7a7" />
                 <TextInput testID="search-input"
+                    accessible={true} 
+                    accessibilityLabel="search-input"
                     placeholder="Search exercise"
                     placeholderTextColor="#7a7a7a"
-                    onChangeText={setSearch}
+                    onChangeText={(text) => handleSearch(text)}
                     value={search}
                     style={styles.input}
                 />
@@ -77,7 +87,7 @@ export default function ExercisesList(){
                 {exercisesList}
             </ScrollView>
             {chosenExercises.length > 0 && 
-                <Pressable testID="addExr-listScreen-btn" onPress={saveChosenExercises} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
+                <Pressable testID="addExr-listScreen-btn" accessible={true} accessibilityLabel="addExr-listScreen-btn" onPress={saveChosenExercises} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
                     <Text style={styles.btnText}>{chosenExercises.length === 1 ? "Add 1 exercise" : `Add ${chosenExercises.length} exercises`}</Text>
                 </Pressable>
             }
@@ -85,6 +95,7 @@ export default function ExercisesList(){
     </>
     )
 }
+
 
 const styles = StyleSheet.create({
     searchBar:{
@@ -99,11 +110,11 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         paddingLeft: 46,
         paddingRight: 10,
-        elevation: 4,          
+        elevation: 3,          
         shadowColor: '#787878',    
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
-        shadowRadius: 4,
+        shadowRadius: 3,
 
     },
     glass: {
@@ -150,8 +161,6 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         bottom: 20,
         left: 120
-
-
     },
     btnText: {
         color: 'white',

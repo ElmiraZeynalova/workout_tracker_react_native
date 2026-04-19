@@ -1,11 +1,11 @@
-import SetForm from "./SetForm"
+import ExerciseSetForm from "./ExerciseSetForm"
 import {Text, Pressable, View, StyleSheet} from 'react-native'
-import { useWorkoutStore } from "../store/workout-store"
+import { useWorkoutStore } from "../zustand-store/workout-store"
 import { exerciseIcons } from '@/assets/icons'
 import exercises from '@/src/exercises.json'
 import Entypo from '@expo/vector-icons/Entypo'
 
-export default function LogExercise({exerciseId}:{exerciseId: string}){
+export default function LogExerciseCard({exerciseId}:{exerciseId: string}){
     const exercise = useWorkoutStore((state) => state.exercises.find(e => e.exerciseId === exerciseId))
     const exerciseSets = exercise?.sets
     const addNewSet = useWorkoutStore((state) => state.addNewSet)
@@ -18,7 +18,7 @@ export default function LogExercise({exerciseId}:{exerciseId: string}){
     }
 
     const setForms = exerciseSets?.map((set, idx) => {
-        return <SetForm key={idx} idx={idx} checked={set.checked} onToggle={() => toggleChecked(exerciseId, idx)} reps={set.reps} weight={set.weight} updateReps={(v) => updateSet(exerciseId, idx, "reps", v)} updateWeight={(v) => updateSet(exerciseId, idx, "weight", v)}/>
+        return <ExerciseSetForm key={idx} idx={idx} checked={set.checked} onToggle={() => toggleChecked(exerciseId, set.setId)} reps={set.reps} weight={set.weight} updateReps={(v) => updateSet(exerciseId, set.setId, "reps", v)} updateWeight={(v) => updateSet(exerciseId, set.setId, "weight", v)}/>
     })
 
     const exerciseIcon = exercises.find(e => e.exerciseName === exercise?.exerciseName)?.iconKey
@@ -29,13 +29,13 @@ export default function LogExercise({exerciseId}:{exerciseId: string}){
             <View style={styles.top}>
                 <Icon width={40} height={40}/>
                 <Text style={styles.exerciseName}>{exercise?.exerciseName}</Text>
-                <Pressable testID="cross-btn" style={({ pressed }) => [pressed && styles.pressed]} onPress={() => deleteExercise(exerciseId)}>
+                <Pressable testID="cross-btn" accessible={true} accessibilityLabel="cross-btn" style={({ pressed }) => [pressed && styles.pressed]} onPress={() => deleteExercise(exerciseId)}>
                     <Entypo name="cross" size={24} color="#858585" />
                 </Pressable>
             </View>
                
             <View style={styles.forms}>{setForms}</View>  
-            <Pressable testID="addSet-btn" onPress={handleAddSetBtnClick} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
+            <Pressable testID="addSet-btn" accessible={true} accessibilityLabel="addSet-btn" onPress={handleAddSetBtnClick} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
                 <Text style={{color: '#FF5526', fontSize: 12, fontWeight: 500}}>Add Set</Text>
             </Pressable>
         </View>
@@ -50,6 +50,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 15,
         padding: 10,
+        marginVertical: 5,
+        marginHorizontal: 5,
+        shadowColor: "#00000053",
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.03,
+        shadowRadius: 14,
+        elevation: 4,
     },
     top: {
         flexDirection: 'row',
