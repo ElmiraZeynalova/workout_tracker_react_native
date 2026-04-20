@@ -1,5 +1,5 @@
 import { StatusBar } from "react-native"
-import {useEffect, useRef, useCallback} from 'react'
+import {useEffect, useRef, useCallback, useState} from 'react'
 import {openDB} from '@/src/sqlite/open_db'
 import {cleanDB, getAllWorkouts, deleteTables} from '@/src/sqlite/crud'
 
@@ -16,46 +16,66 @@ export default function RootLayout() {
   const userId = useUserStore((state) => state.userId)
   const isSyncing = useRef(false)
   const wasOffline = useRef(false)
+  const [dbReady, setDbReady] = useState(false)   
+    const pendingSync = useRef(false) // ← добавь
 
   const init = useCallback(async () => {
-      if (isSyncing.current) return
-      isSyncing.current = true
-      try {
-          const workouts = await getAllWorkouts()
-          setAllWorkouts(workouts)
-          await syncServerWithSQLite()
-          await syncSqliteWithServer()
-      } catch (err) {
-          console.warn("Sync failed", err)
-      } finally {
-          isSyncing.current = false
-      }
+    if (!dbReady) {
+      pendingSync.current = true // ← запомни что нужно синкнуть
+      return
+    }
+    if (isSyncing.current) return
+    isSyncing.current = true
+    try {
+      const workouts = await getAllWorkouts()
+      setAllWorkouts(workouts)
+      await syncServerWithSQLite()
+      await syncSqliteWithServer()
+    } catch (err) {
+      console.warn("Sync failed", err)
+    } finally {
+      isSyncing.current = false
+    }
+  }, [dbReady])
+
+  useEffect(() => {
+    const start = async () => {
+      await openDB()
+      setDbReady(true)
+    }
+    start()
   }, [])
 
   useEffect(() => {
-      const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
-          if (session) {
-              setUserId(session.user.id)
-              init()
-          }
-      })
+    if (dbReady && pendingSync.current) {
+      pendingSync.current = false
+      init()
+    }
+  }, [dbReady])
 
-    const unsubscribeNetInfo = NetInfo.addEventListener(state => {
-        if (!state.isConnected) {
-            wasOffline.current = true
-        return
-        }
-
-        if (state.isConnected && wasOffline.current) {
-            wasOffline.current = false
-            init()
-        }
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
+      if (session) {
+        setUserId(session.user.id)
+        init()
+      }
     })
 
-      return () => {
-          authListener?.subscription.unsubscribe()
-          unsubscribeNetInfo()
+    const unsubscribeNetInfo = NetInfo.addEventListener(state => {
+      if (!state.isConnected) {
+        wasOffline.current = true
+        return
       }
+      if (state.isConnected && wasOffline.current) {
+        wasOffline.current = false
+        init()
+      }
+    })
+
+    return () => {
+      authListener?.subscription.unsubscribe()
+      unsubscribeNetInfo()
+    }
   }, [init])
 
 
