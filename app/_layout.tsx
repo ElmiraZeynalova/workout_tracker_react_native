@@ -2,13 +2,14 @@ import { StatusBar } from "react-native"
 import {useEffect, useRef, useCallback, useState} from 'react'
 import {openDB} from '@/src/sqlite/open_db'
 import {cleanDB, getAllWorkouts, deleteTables} from '@/src/sqlite/crud'
-
+import '../src/sockets/socket_manager'
 import {createTables} from '@/src/sqlite/create_tables'
 import { supabase, syncServerWithSQLite, syncSqliteWithServer } from '@/src/supabase/crud'
 import { useUserStore } from "@/src/zustand-store/user-store";
 import { useRenderWorkoutOnScreenStore } from "@/src/zustand-store/render-workout-store"
 import { Stack, Redirect } from 'expo-router'
 import NetInfo from '@react-native-community/netinfo'
+import {socket} from '../src/sockets/socket'
 
 export default function RootLayout() {
   const setUserId = useUserStore((state) => state.setUserId)
@@ -17,11 +18,11 @@ export default function RootLayout() {
   const isSyncing = useRef(false)
   const wasOffline = useRef(false)
   const [dbReady, setDbReady] = useState(false)   
-    const pendingSync = useRef(false) // ← добавь
+  const pendingSync = useRef(false) 
 
   const init = useCallback(async () => {
     if (!dbReady) {
-      pendingSync.current = true // ← запомни что нужно синкнуть
+      pendingSync.current = true 
       return
     }
     if (isSyncing.current) return
@@ -55,10 +56,13 @@ export default function RootLayout() {
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
-      if (session) {
-        setUserId(session.user.id)
-        init()
-      }
+    if (session) {
+      setUserId(session.user.id);
+      init();
+
+      socket.io.opts.query = { userId: session.user.id };
+      socket.connect();
+    }
     })
 
     const unsubscribeNetInfo = NetInfo.addEventListener(state => {
@@ -75,6 +79,7 @@ export default function RootLayout() {
     return () => {
       authListener?.subscription.unsubscribe()
       unsubscribeNetInfo()
+      socket.disconnect();
     }
   }, [init])
 

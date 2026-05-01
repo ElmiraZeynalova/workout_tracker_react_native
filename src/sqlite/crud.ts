@@ -1,5 +1,6 @@
 import {openDB} from './open_db'
 import * as Crypto from 'expo-crypto'
+import {socket} from '../sockets/socket'
 
 type SetInfo = {
     setId: string
@@ -97,6 +98,11 @@ export async function saveWorkout(date: string, exercises: Exercise[], status: n
             )
         }
 
+    }
+
+    if (socket.connected) {
+      console.log("Sending workout to socket")
+      socket.emit("SET_WORKOUT", {date, exercises});
     }
 }
 

@@ -31,11 +31,6 @@
         },
         {
             "iconKey": "squat",
-            "exerciseName": "Sumo Squats",
-            "muscleGroup": "Glutes"
-        },
-        {
-            "iconKey": "squat",
             "exerciseName": "Lunges",
             "muscleGroup": "Quads"
         },
@@ -111,6 +106,11 @@
         },
         {
             "iconKey": "squat",
+            "exerciseName": "Clamshells",
+            "muscleGroup": "Glutes"
+        },
+        {
+            "iconKey": "squat",
             "exerciseName": "Single Leg Calf Raises",
             "muscleGroup": "Calves"
         },
@@ -139,10 +139,10 @@
             "exerciseName": "Front Raises",
             "muscleGroup": "Shoulders"
         },
-        {
-            "iconKey": "biceps",
-            "exerciseName": "Arnold Press",
-            "muscleGroup": "Shoulders"
+                {
+            "iconKey": "bicep",
+            "exerciseName": "Step Ups",
+            "muscleGroup": "Glutes"
         }
 ]
     
