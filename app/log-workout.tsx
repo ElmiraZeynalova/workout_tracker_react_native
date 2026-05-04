@@ -11,6 +11,7 @@ import {saveWorkout} from '@/src/sqlite/crud'
 import DumbbellIcon from '@/assets/icons/grey_dumbbell.svg'
 import { useRenderWorkoutOnScreenStore } from '@/src/zustand-store/render-workout-store'
 import { syncServerWithSQLite } from '@/src/supabase/crud';
+import {SocketManager} from '../src/sockets/SocketManager'
 
 type SetInfo = {
     setId: string
@@ -56,6 +57,7 @@ export default function LogWorkout() {
               addExercises(currentWorkoutDate, cleanedExercises)
               router.navigate('/')
               await saveWorkout(currentWorkoutDate, cleanedExercises, 0)
+              SocketManager.send("SET_WORKOUT", { currentWorkoutDate, cleanedExercises });
               clearWorkoutStore()
               syncServerWithSQLite().catch(console.error)
 

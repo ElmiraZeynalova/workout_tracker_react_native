@@ -29,10 +29,20 @@ type RenderWorkoutStore = {
 
 export const useRenderWorkoutOnScreenStore = create<RenderWorkoutStore>((set) => ({
     workouts: {},
-    setWorkout: (date, exercises) =>
-        set(state => ({
-            workouts: {...state.workouts, [date]: {date, exercises}}
-        })),
+    setWorkout: (date, newExercises) =>
+        set((state) => {
+        const existingExercises = state.workouts[date]?.exercises || [];
+
+        return {
+            workouts: {
+            ...state.workouts,
+            [date]: {
+                date,
+                exercises: [...existingExercises, ...newExercises],
+            },
+            },
+        };
+    }),
     removeWorkout: (date) =>
         set(state => {
             const copy = { ...state.workouts }

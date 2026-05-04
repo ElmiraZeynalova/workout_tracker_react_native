@@ -14,10 +14,11 @@ function generateDateRange(centerDate: string){
     )
 }
 
-export default function MainSwiper(){
+export default function DaySwiper(){
     const selectedDate = useDateStore(state => state.selectedDate)
     const setSelectedDate = useDateStore(state => state.setSelectedDate)
-    const [centerDate, setCenterDate] = useState(selectedDate)
+    const centerDate = useDateStore(state => state.centerDate)
+    const setCenterDate = useDateStore(state => state.setCenterDate)
     const pagerRef = useRef<PagerView>(null)
 
     const dates = useMemo(
@@ -25,12 +26,15 @@ export default function MainSwiper(){
         [centerDate]
     )
 
-    const initialSlideIndex = dates.findIndex(date => date === selectedDate)
+    const initialSlideIndex = useMemo(() => {
+        return dates.findIndex(date => date === selectedDate);
+    }, [dates, selectedDate])
 
     useEffect(() => {
-        if(!pagerRef.current) return
         const index = dates.findIndex(date => date === selectedDate)
-        pagerRef.current.setPage(index)
+        if (index >= 0 && pagerRef.current) {
+            pagerRef.current.setPage(index);
+        }
     }, [selectedDate, dates])
 
     function handleSelectedPage(e: any){

@@ -1,30 +1,31 @@
 import { StatusBar } from "react-native"
-import {useEffect, useRef, useCallback, useState} from 'react'
-import {openDB} from '@/src/sqlite/open_db'
-import {cleanDB, getAllWorkouts, deleteTables} from '@/src/sqlite/crud'
-import '../src/sockets/socket_manager'
-import {createTables} from '@/src/sqlite/create_tables'
+import { useEffect, useRef, useCallback} from 'react'
+import { getAllWorkouts } from '@/src/sqlite/crud'
 import { supabase, syncServerWithSQLite, syncSqliteWithServer } from '@/src/supabase/crud'
-import { useUserStore } from "@/src/zustand-store/user-store";
+import { useUserStore } from "@/src/zustand-store/user-store"
 import { useRenderWorkoutOnScreenStore } from "@/src/zustand-store/render-workout-store"
-import { Stack, Redirect } from 'expo-router'
+import { Stack, useRouter, usePathname } from 'expo-router'
 import NetInfo from '@react-native-community/netinfo'
-import {socket} from '../src/sockets/socket'
+import { SocketManager } from '../src/sockets/SocketManager'
+import { DeepLinkRouter } from '../src/navigation/DeepLinkRouter'
+import * as Linking from 'expo-linking';
 
 export default function RootLayout() {
+  const router = useRouter();
+  const pathname = usePathname();
+  
   const setUserId = useUserStore((state) => state.setUserId)
   const setAllWorkouts = useRenderWorkoutOnScreenStore((state) => state.setAll)
   const userId = useUserStore((state) => state.userId)
+  
+  const pendingDeepLink = useUserStore((state) => state.pendingDeepLink)
+  const setPendingDeepLink = useUserStore((state) => state.setPendingDeepLink)
+
   const isSyncing = useRef(false)
   const wasOffline = useRef(false)
-  const [dbReady, setDbReady] = useState(false)   
-  const pendingSync = useRef(false) 
+
 
   const init = useCallback(async () => {
-    if (!dbReady) {
-      pendingSync.current = true 
-      return
-    }
     if (isSyncing.current) return
     isSyncing.current = true
     try {
@@ -37,32 +38,19 @@ export default function RootLayout() {
     } finally {
       isSyncing.current = false
     }
-  }, [dbReady])
-
-  useEffect(() => {
-    const start = async () => {
-      await openDB()
-      setDbReady(true)
-    }
-    start()
   }, [])
 
-  useEffect(() => {
-    if (dbReady && pendingSync.current) {
-      pendingSync.current = false
-      init()
-    }
-  }, [dbReady])
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
-    if (session) {
-      setUserId(session.user.id);
-      init();
-
-      socket.io.opts.query = { userId: session.user.id };
-      socket.connect();
-    }
+      if (session) {
+        setUserId(session.user.id);
+        init();
+        SocketManager.connect(session.user.id);
+      } else {
+        setUserId(null)
+        SocketManager.disconnect();
+      }
     })
 
     const unsubscribeNetInfo = NetInfo.addEventListener(state => {
@@ -79,16 +67,54 @@ export default function RootLayout() {
     return () => {
       authListener?.subscription.unsubscribe()
       unsubscribeNetInfo()
-      socket.disconnect();
+      SocketManager.disconnect();
     }
-  }, [init])
+  }, [init, setUserId])
+
+
+  useEffect(() => {
+    Linking.getInitialURL().then(url => {
+      if (url) setPendingDeepLink(url);
+    });
+  }, []) 
+
+
+  useEffect(() => {
+    const handleURL = (url: string) => {
+      if (!userId) {
+        setPendingDeepLink(url);
+      } else {
+        DeepLinkRouter.handle(url);  
+      }
+    };
+
+    const subscription = Linking.addEventListener('url', ({ url }) => handleURL(url));
+    return () => subscription.remove();
+  }, [userId])
+
+
+  useEffect(() => {
+    if (userId && pendingDeepLink && pathname === '/') {
+      DeepLinkRouter.handle(pendingDeepLink)
+      setPendingDeepLink(null)
+    }
+  }, [userId, pendingDeepLink, pathname])
+
+
+  useEffect(() => {
+    const isAuthPage = pathname === '/log-in'
+    if (!userId && !isAuthPage) {
+      router.replace('/log-in')
+    } else if (userId && isAuthPage) {
+      router.replace('/')
+    }
+  }, [userId, pathname])
 
 
   return (
     <>
       <StatusBar barStyle="dark-content" backgroundColor='#F3F3F3' />
-      <Stack></Stack>
-      {userId ? <Redirect href="/" /> : <Redirect href="/log-in" />}
+      <Stack  />
     </>
   )
 }

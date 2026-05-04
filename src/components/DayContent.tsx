@@ -1,5 +1,5 @@
 import LoggedExerciseCard from '@/src/components/LoggedExerciseCard'
-import {Text, StyleSheet, View, Pressable, ScrollView} from 'react-native'
+import {Text, StyleSheet, View, Pressable, ScrollView, Button, TouchableOpacity} from 'react-native'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import { useRouter } from 'expo-router'
 import { useRenderWorkoutOnScreenStore } from "../zustand-store/render-workout-store"
