@@ -1,7 +1,6 @@
 import {openDB} from './open_db'
 import * as Crypto from 'expo-crypto'
 
-
 type SetInfo = {
     setId: string
     reps: number

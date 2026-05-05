@@ -57,7 +57,7 @@ export default function LogWorkout() {
               addExercises(currentWorkoutDate, cleanedExercises)
               router.navigate('/')
               await saveWorkout(currentWorkoutDate, cleanedExercises, 0)
-              SocketManager.send("SET_WORKOUT", { currentWorkoutDate, cleanedExercises });
+              SocketManager.send("SET_WORKOUT", { date: currentWorkoutDate, exercises: cleanedExercises });
               clearWorkoutStore()
               syncServerWithSQLite().catch(console.error)
 

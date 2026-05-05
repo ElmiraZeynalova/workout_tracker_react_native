@@ -63,9 +63,9 @@ export default function DebugScreen() {
             headerTitle: 'Debug',
             headerTintColor: 'white',
             headerTitleAlign: 'center',
-            headerShadowVisible: false,
+            headerShadowVisible: true,
             headerStyle: {
-                backgroundColor: '#191919',
+                backgroundColor: '#111111',
             },
         }} />
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
